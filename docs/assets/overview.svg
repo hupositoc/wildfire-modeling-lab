@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="420" viewBox="0 0 1280 420" role="img" aria-labelledby="title description">
+<title id="title">Wildfire Modeling Lab overview</title>
+<desc id="description">Audit and reconstruct the author’s wildfire-spread DQN thesis with explicit data provenance and evaluation boundaries. Flow: Audit thesis claims; Reconstruct inputs; Train / inspect policy; Evaluate observed mask</desc>
+<rect width="1280" height="420" rx="24" fill="#ffffff"/>
+<g font-family="sans-serif">
+<text font-family="Arial" x="48" y="54" font-size="20" font-weight="700" fill="#1b64da">APPLIED AI / REPRODUCIBLE RESEARCH</text>
+<text font-family="Arial" x="48" y="112" font-size="44" font-weight="700" fill="#191f28">Wildfire Modeling Lab</text>
+<text font-family="Arial" x="48" y="156" font-size="24" fill="#4e5968">Reconstruct a thesis model and verify what its score really means</text>
+<rect x="48" y="202" width="1184" height="154" rx="16" fill="#f2f4f6"/>
+<text font-family="Arial" x="72" y="238" font-size="18" font-weight="700" fill="#1b64da">PURPOSE</text>
+<text font-family="Arial" x="72" y="276" font-size="24" fill="#191f28">Audit and reconstruct the author’s wildfire-spread DQN thesis with explicit data</text>
+<text font-family="Arial" x="72" y="306" font-size="24" fill="#191f28">provenance and evaluation boundaries.</text>
+<text font-family="Arial" x="48" y="396" font-size="18" fill="#4e5968">Engineering overview · purpose, implementation and evidence</text>
+</g></svg>

@@ -1,0 +1,1108 @@
+{
+  "kind": "synthetic_implementation_benchmark",
+  "thesis_reproduction": false,
+  "observed_mask_available": false,
+  "iou": null,
+  "target_iou": 0.726,
+  "target_used_for_training": false,
+  "seed": 7,
+  "config": {
+    "size": 50,
+    "horizon": 100,
+    "dt_seconds": 1800.0,
+    "cell_m": 100.0,
+    "diffusion_scale": 0.1,
+    "gamma": 1.0,
+    "weights": [
+      0.264,
+      0.113,
+      0.14,
+      0.483
+    ],
+    "ndvi_mode": "literal",
+    "rounding": "floor",
+    "emc_max": 20.0
+  },
+  "architecture": [
+    8,
+    64,
+    64,
+    9
+  ],
+  "optimizer": "Adam",
+  "learning_rate": 0.001,
+  "batch_size": 64,
+  "replay_capacity": 20000,
+  "target_sync_updates": 100,
+  "gradient_clip": 10.0,
+  "episodes": 160,
+  "updates": 4622,
+  "training_seconds": 31.7945488,
+  "training_trace": [
+    {
+      "episode": 0,
+      "return": -1.7075579743252127,
+      "epsilon": 1.0,
+      "loss": null
+    },
+    {
+      "episode": 1,
+      "return": 2.6879417618394763,
+      "epsilon": 0.9921875,
+      "loss": null
+    },
+    {
+      "episode": 2,
+      "return": 0.8533468202302539,
+      "epsilon": 0.984375,
+      "loss": null
+    },
+    {
+      "episode": 3,
+      "return": -0.9032967151259514,
+      "epsilon": 0.9765625,
+      "loss": null
+    },
+    {
+      "episode": 4,
+      "return": 0.673476356512228,
+      "epsilon": 0.96875,
+      "loss": null
+    },
+    {
+      "episode": 5,
+      "return": 3.665783074597618,
+      "epsilon": 0.9609375,
+      "loss": null
+    },
+    {
+      "episode": 6,
+      "return": 7.17906066314633,
+      "epsilon": 0.953125,
+      "loss": null
+    },
+    {
+      "episode": 7,
+      "return": 3.6284466813373197,
+      "epsilon": 0.9453125,
+      "loss": null
+    },
+    {
+      "episode": 8,
+      "return": 4.2456458410914735,
+      "epsilon": 0.9375,
+      "loss": null
+    },
+    {
+      "episode": 9,
+      "return": -0.5147704733866101,
+      "epsilon": 0.9296875,
+      "loss": null
+    },
+    {
+      "episode": 10,
+      "return": -3.2774029018959734,
+      "epsilon": 0.921875,
+      "loss": null
+    },
+    {
+      "episode": 11,
+      "return": 2.0884357520642722,
+      "epsilon": 0.9140625,
+      "loss": null
+    },
+    {
+      "episode": 12,
+      "return": 6.074730983157547,
+      "epsilon": 0.90625,
+      "loss": null
+    },
+    {
+      "episode": 13,
+      "return": -3.2309233953781424,
+      "epsilon": 0.8984375,
+      "loss": null
+    },
+    {
+      "episode": 14,
+      "return": -2.8319741631576085,
+      "epsilon": 0.890625,
+      "loss": null
+    },
+    {
+      "episode": 15,
+      "return": -1.722366742652971,
+      "epsilon": 0.8828125,
+      "loss": null
+    },
+    {
+      "episode": 16,
+      "return": -3.278038186072373,
+      "epsilon": 0.875,
+      "loss": null
+    },
+    {
+      "episode": 17,
+      "return": 3.0135012963479433,
+      "epsilon": 0.8671875,
+      "loss": null
+    },
+    {
+      "episode": 18,
+      "return": -3.223769417194892,
+      "epsilon": 0.859375,
+      "loss": null
+    },
+    {
+      "episode": 19,
+      "return": 4.921373911807443,
+      "epsilon": 0.8515625,
+      "loss": null
+    },
+    {
+      "episode": 20,
+      "return": 2.047446841936061,
+      "epsilon": 0.84375,
+      "loss": null
+    },
+    {
+      "episode": 21,
+      "return": 0.37891376227864293,
+      "epsilon": 0.8359375,
+      "loss": null
+    },
+    {
+      "episode": 22,
+      "return": 3.711846367383023,
+      "epsilon": 0.828125,
+      "loss": 5.862890243530273
+    },
+    {
+      "episode": 23,
+      "return": -2.02468766061703,
+      "epsilon": 0.8203125,
+      "loss": 5.6565165519714355
+    },
+    {
+      "episode": 24,
+      "return": -2.0990900812944373,
+      "epsilon": 0.8125,
+      "loss": 5.9919114112854
+    },
+    {
+      "episode": 25,
+      "return": 1.1522708844988638,
+      "epsilon": 0.8046875,
+      "loss": 5.78145170211792
+    },
+    {
+      "episode": 26,
+      "return": -4.586257529625383,
+      "epsilon": 0.796875,
+      "loss": 5.24209451675415
+    },
+    {
+      "episode": 27,
+      "return": 6.949549768029999,
+      "epsilon": 0.7890625,
+      "loss": 4.799073711518319
+    },
+    {
+      "episode": 28,
+      "return": -3.3289038094271133,
+      "epsilon": 0.78125,
+      "loss": 5.201338768005371
+    },
+    {
+      "episode": 29,
+      "return": -5.2142093039376665,
+      "epsilon": 0.7734375,
+      "loss": 4.371299076080322
+    },
+    {
+      "episode": 30,
+      "return": 6.85302129996697,
+      "epsilon": 0.765625,
+      "loss": 4.097588555018107
+    },
+    {
+      "episode": 31,
+      "return": 30.6725861552708,
+      "epsilon": 0.7578125,
+      "loss": 4.064248561859131
+    },
+    {
+      "episode": 32,
+      "return": -2.727809392593416,
+      "epsilon": 0.75,
+      "loss": 4.581444263458252
+    },
+    {
+      "episode": 33,
+      "return": 0.2481555140425381,
+      "epsilon": 0.7421875,
+      "loss": 4.968842347462972
+    },
+    {
+      "episode": 34,
+      "return": 1.6529712720681093,
+      "epsilon": 0.734375,
+      "loss": 6.7525410652160645
+    },
+    {
+      "episode": 35,
+      "return": 5.322735794860343,
+      "epsilon": 0.7265625,
+      "loss": 6.163983583450317
+    },
+    {
+      "episode": 36,
+      "return": 22.40982815390366,
+      "epsilon": 0.71875,
+      "loss": 4.486980211734772
+    },
+    {
+      "episode": 37,
+      "return": 2.7271046188705426,
+      "epsilon": 0.7109375,
+      "loss": 3.6316619873046876
+    },
+    {
+      "episode": 38,
+      "return": 0.7943683374777512,
+      "epsilon": 0.703125,
+      "loss": 4.154086271921794
+    },
+    {
+      "episode": 39,
+      "return": 2.691751353261557,
+      "epsilon": 0.6953125,
+      "loss": 3.2379279136657715
+    },
+    {
+      "episode": 40,
+      "return": 57.59360817492474,
+      "epsilon": 0.6875,
+      "loss": 3.314208803353486
+    },
+    {
+      "episode": 41,
+      "return": 5.301440132695059,
+      "epsilon": 0.6796875,
+      "loss": 3.0266237258911133
+    },
+    {
+      "episode": 42,
+      "return": -2.394752754706868,
+      "epsilon": 0.671875,
+      "loss": 2.482548475265503
+    },
+    {
+      "episode": 43,
+      "return": 7.630137678984007,
+      "epsilon": 0.6640625,
+      "loss": 2.5155110955238342
+    },
+    {
+      "episode": 44,
+      "return": 12.218365300645118,
+      "epsilon": 0.65625,
+      "loss": 2.646933174133301
+    },
+    {
+      "episode": 45,
+      "return": 1.2775069002223876,
+      "epsilon": 0.6484375,
+      "loss": 10.71181869506836
+    },
+    {
+      "episode": 46,
+      "return": 14.180478564840156,
+      "epsilon": 0.640625,
+      "loss": 7.99478799646551
+    },
+    {
+      "episode": 47,
+      "return": 3.0893457913924762,
+      "epsilon": 0.6328125,
+      "loss": 5.42681900660197
+    },
+    {
+      "episode": 48,
+      "return": 21.41940651012868,
+      "epsilon": 0.625,
+      "loss": 5.3348910212516785
+    },
+    {
+      "episode": 49,
+      "return": 27.59694565564775,
+      "epsilon": 0.6171875,
+      "loss": 4.771928184172687
+    },
+    {
+      "episode": 50,
+      "return": 6.309592890863925,
+      "epsilon": 0.609375,
+      "loss": 4.131758848826091
+    },
+    {
+      "episode": 51,
+      "return": 17.061250469878832,
+      "epsilon": 0.6015625,
+      "loss": 4.1369413534800215
+    },
+    {
+      "episode": 52,
+      "return": 8.078203701153368,
+      "epsilon": 0.59375,
+      "loss": 4.1256223406110495
+    },
+    {
+      "episode": 53,
+      "return": 6.417961974188013,
+      "epsilon": 0.5859375,
+      "loss": 3.4693989753723145
+    },
+    {
+      "episode": 54,
+      "return": 26.18717723644183,
+      "epsilon": 0.578125,
+      "loss": 3.9170528411865235
+    },
+    {
+      "episode": 55,
+      "return": 0.9083958068740117,
+      "epsilon": 0.5703125,
+      "loss": 4.342394113540649
+    },
+    {
+      "episode": 56,
+      "return": -4.658621976643929,
+      "epsilon": 0.5625,
+      "loss": 3.9519727528095245
+    },
+    {
+      "episode": 57,
+      "return": 3.426350788584312,
+      "epsilon": 0.5546875,
+      "loss": 3.938685417175293
+    },
+    {
+      "episode": 58,
+      "return": -2.0481801083668434,
+      "epsilon": 0.546875,
+      "loss": 3.411623239517212
+    },
+    {
+      "episode": 59,
+      "return": -2.610913039704475,
+      "epsilon": 0.5390625,
+      "loss": 3.170273542404175
+    },
+    {
+      "episode": 60,
+      "return": 3.8278206967212394,
+      "epsilon": 0.53125,
+      "loss": 3.642019828160604
+    },
+    {
+      "episode": 61,
+      "return": 3.4820204538350708,
+      "epsilon": 0.5234375,
+      "loss": 4.351144409179687
+    },
+    {
+      "episode": 62,
+      "return": 8.579621445351004,
+      "epsilon": 0.515625,
+      "loss": 6.8399828433990475
+    },
+    {
+      "episode": 63,
+      "return": 18.614912511140915,
+      "epsilon": 0.5078125,
+      "loss": 7.904043344350962
+    },
+    {
+      "episode": 64,
+      "return": -3.449526125528266,
+      "epsilon": 0.5,
+      "loss": 7.310950040817261
+    },
+    {
+      "episode": 65,
+      "return": -3.041356409334181,
+      "epsilon": 0.4921875,
+      "loss": 6.582562174115862
+    },
+    {
+      "episode": 66,
+      "return": 2.0556830410052207,
+      "epsilon": 0.484375,
+      "loss": 8.684412956237793
+    },
+    {
+      "episode": 67,
+      "return": 10.671504375664394,
+      "epsilon": 0.4765625,
+      "loss": 8.038532018661499
+    },
+    {
+      "episode": 68,
+      "return": 7.710609256355205,
+      "epsilon": 0.46875,
+      "loss": 6.775487422943115
+    },
+    {
+      "episode": 69,
+      "return": 17.81631244246048,
+      "epsilon": 0.4609375,
+      "loss": 6.971290306611494
+    },
+    {
+      "episode": 70,
+      "return": 9.218598200299649,
+      "epsilon": 0.453125,
+      "loss": 6.095433306694031
+    },
+    {
+      "episode": 71,
+      "return": 12.054602809167779,
+      "epsilon": 0.4453125,
+      "loss": 6.4756841940038345
+    },
+    {
+      "episode": 72,
+      "return": 16.150832949668448,
+      "epsilon": 0.4375,
+      "loss": 6.9847491979599
+    },
+    {
+      "episode": 73,
+      "return": 3.952024976142489,
+      "epsilon": 0.4296875,
+      "loss": 5.926442384719849
+    },
+    {
+      "episode": 74,
+      "return": 13.761238354589956,
+      "epsilon": 0.421875,
+      "loss": 9.201413807116056
+    },
+    {
+      "episode": 75,
+      "return": 0.6602599163945386,
+      "epsilon": 0.4140625,
+      "loss": 8.366656303405762
+    },
+    {
+      "episode": 76,
+      "return": 1.9471990502143735,
+      "epsilon": 0.40625,
+      "loss": 7.707431316375732
+    },
+    {
+      "episode": 77,
+      "return": 12.304099172535567,
+      "epsilon": 0.3984375,
+      "loss": 7.807971749986921
+    },
+    {
+      "episode": 78,
+      "return": 17.41341988565701,
+      "epsilon": 0.390625,
+      "loss": 7.932946583803962
+    },
+    {
+      "episode": 79,
+      "return": 25.08321342073666,
+      "epsilon": 0.3828125,
+      "loss": 6.9515749083624945
+    },
+    {
+      "episode": 80,
+      "return": 6.135648469658127,
+      "epsilon": 0.375,
+      "loss": 8.212984472513199
+    },
+    {
+      "episode": 81,
+      "return": 5.245360675812471,
+      "epsilon": 0.3671875,
+      "loss": 6.277347803115845
+    },
+    {
+      "episode": 82,
+      "return": 9.808291115358877,
+      "epsilon": 0.359375,
+      "loss": 8.555931091308594
+    },
+    {
+      "episode": 83,
+      "return": 11.306493511002458,
+      "epsilon": 0.3515625,
+      "loss": 8.022593593597412
+    },
+    {
+      "episode": 84,
+      "return": 36.480978238923996,
+      "epsilon": 0.34375,
+      "loss": 8.14131633337442
+    },
+    {
+      "episode": 85,
+      "return": 19.176346071539026,
+      "epsilon": 0.3359375,
+      "loss": 8.155689856585335
+    },
+    {
+      "episode": 86,
+      "return": 19.926448291471452,
+      "epsilon": 0.328125,
+      "loss": 7.95852838243757
+    },
+    {
+      "episode": 87,
+      "return": -1.9959321158229864,
+      "epsilon": 0.3203125,
+      "loss": 10.587629318237305
+    },
+    {
+      "episode": 88,
+      "return": 26.347893311862524,
+      "epsilon": 0.3125,
+      "loss": 7.187412685818142
+    },
+    {
+      "episode": 89,
+      "return": 7.83240540094108,
+      "epsilon": 0.3046875,
+      "loss": 8.777452200651169
+    },
+    {
+      "episode": 90,
+      "return": 29.70043849015449,
+      "epsilon": 0.296875,
+      "loss": 8.068952054977418
+    },
+    {
+      "episode": 91,
+      "return": 8.471552546998975,
+      "epsilon": 0.2890625,
+      "loss": 8.08719938993454
+    },
+    {
+      "episode": 92,
+      "return": 18.126957303563803,
+      "epsilon": 0.28125,
+      "loss": 8.045414368311564
+    },
+    {
+      "episode": 93,
+      "return": -0.23660851218740506,
+      "epsilon": 0.2734375,
+      "loss": 11.267628192901611
+    },
+    {
+      "episode": 94,
+      "return": 22.055244196308816,
+      "epsilon": 0.265625,
+      "loss": 9.734964470863343
+    },
+    {
+      "episode": 95,
+      "return": 1.5415931182676916,
+      "epsilon": 0.2578125,
+      "loss": 7.8763628005981445
+    },
+    {
+      "episode": 96,
+      "return": 7.026527531445815,
+      "epsilon": 0.25,
+      "loss": 8.165796995162964
+    },
+    {
+      "episode": 97,
+      "return": 27.32039162388237,
+      "epsilon": 0.2421875,
+      "loss": 10.339932236016965
+    },
+    {
+      "episode": 98,
+      "return": 11.168624313809644,
+      "epsilon": 0.234375,
+      "loss": 10.084506046481248
+    },
+    {
+      "episode": 99,
+      "return": 0.8946471103197104,
+      "epsilon": 0.2265625,
+      "loss": 7.34982697168986
+    },
+    {
+      "episode": 100,
+      "return": -3.443615185021533,
+      "epsilon": 0.21875,
+      "loss": 10.473019576072693
+    },
+    {
+      "episode": 101,
+      "return": 0.8769065932833328,
+      "epsilon": 0.2109375,
+      "loss": 8.150657653808594
+    },
+    {
+      "episode": 102,
+      "return": 18.169640773480886,
+      "epsilon": 0.203125,
+      "loss": 10.520897199941237
+    },
+    {
+      "episode": 103,
+      "return": 9.897050486880815,
+      "epsilon": 0.1953125,
+      "loss": 11.493712395429611
+    },
+    {
+      "episode": 104,
+      "return": 28.364178090119765,
+      "epsilon": 0.1875,
+      "loss": 11.577492620944977
+    },
+    {
+      "episode": 105,
+      "return": 35.562969448282,
+      "epsilon": 0.1796875,
+      "loss": 10.470477232933044
+    },
+    {
+      "episode": 106,
+      "return": 33.41533770191625,
+      "epsilon": 0.171875,
+      "loss": 10.498947338979752
+    },
+    {
+      "episode": 107,
+      "return": 34.470511606264296,
+      "epsilon": 0.1640625,
+      "loss": 11.419366006851197
+    },
+    {
+      "episode": 108,
+      "return": -16.5940863641248,
+      "epsilon": 0.15625,
+      "loss": 12.264583406448365
+    },
+    {
+      "episode": 109,
+      "return": 5.489930036405635,
+      "epsilon": 0.1484375,
+      "loss": 9.252547232309977
+    },
+    {
+      "episode": 110,
+      "return": 4.8168015083226905,
+      "epsilon": 0.140625,
+      "loss": 12.392101593017578
+    },
+    {
+      "episode": 111,
+      "return": -1.6504899068118744,
+      "epsilon": 0.1328125,
+      "loss": 14.436274577336139
+    },
+    {
+      "episode": 112,
+      "return": 2.678743684673395,
+      "epsilon": 0.125,
+      "loss": 13.764091491699219
+    },
+    {
+      "episode": 113,
+      "return": 13.870365297340115,
+      "epsilon": 0.1171875,
+      "loss": 13.732397622075574
+    },
+    {
+      "episode": 114,
+      "return": -76.20574134005679,
+      "epsilon": 0.109375,
+      "loss": 14.41265389442444
+    },
+    {
+      "episode": 115,
+      "return": 51.667871612549924,
+      "epsilon": 0.1015625,
+      "loss": 16.10659558057785
+    },
+    {
+      "episode": 116,
+      "return": 13.335460722459674,
+      "epsilon": 0.09375,
+      "loss": 13.882223076290554
+    },
+    {
+      "episode": 117,
+      "return": 50.0823337565017,
+      "epsilon": 0.0859375,
+      "loss": 15.797110390663146
+    },
+    {
+      "episode": 118,
+      "return": 30.495076064660896,
+      "epsilon": 0.08,
+      "loss": 17.14173412322998
+    },
+    {
+      "episode": 119,
+      "return": 17.151636275239834,
+      "epsilon": 0.08,
+      "loss": 15.553736168405283
+    },
+    {
+      "episode": 120,
+      "return": 4.982898165044937,
+      "epsilon": 0.08,
+      "loss": 14.711795330047607
+    },
+    {
+      "episode": 121,
+      "return": -12.0563364786344,
+      "epsilon": 0.08,
+      "loss": 16.167416935875302
+    },
+    {
+      "episode": 122,
+      "return": 26.27910362443021,
+      "epsilon": 0.08,
+      "loss": 20.218522707621258
+    },
+    {
+      "episode": 123,
+      "return": 18.405472637263877,
+      "epsilon": 0.08,
+      "loss": 17.276283547684955
+    },
+    {
+      "episode": 124,
+      "return": 36.84740481652651,
+      "epsilon": 0.08,
+      "loss": 16.744409950952683
+    },
+    {
+      "episode": 125,
+      "return": 6.186541000907439,
+      "epsilon": 0.08,
+      "loss": 23.334804943629674
+    },
+    {
+      "episode": 126,
+      "return": 21.60885110746808,
+      "epsilon": 0.08,
+      "loss": 18.716710009664858
+    },
+    {
+      "episode": 127,
+      "return": 1.7318314390516651,
+      "epsilon": 0.08,
+      "loss": 8.199394226074219
+    },
+    {
+      "episode": 128,
+      "return": -0.42118269104492434,
+      "epsilon": 0.08,
+      "loss": 20.457697587013243
+    },
+    {
+      "episode": 129,
+      "return": 41.23165448357072,
+      "epsilon": 0.08,
+      "loss": 22.998395428061485
+    },
+    {
+      "episode": 130,
+      "return": 10.832767181744078,
+      "epsilon": 0.08,
+      "loss": 21.180017478466034
+    },
+    {
+      "episode": 131,
+      "return": 31.678908025158556,
+      "epsilon": 0.08,
+      "loss": 20.511648813883465
+    },
+    {
+      "episode": 132,
+      "return": 38.795545587394066,
+      "epsilon": 0.08,
+      "loss": 23.09318838324598
+    },
+    {
+      "episode": 133,
+      "return": 44.37898545116201,
+      "epsilon": 0.08,
+      "loss": 23.098684163320634
+    },
+    {
+      "episode": 134,
+      "return": 8.324821001646331,
+      "epsilon": 0.08,
+      "loss": 23.698299217224122
+    },
+    {
+      "episode": 135,
+      "return": 2.2574620007161847,
+      "epsilon": 0.08,
+      "loss": 9.262516975402832
+    },
+    {
+      "episode": 136,
+      "return": 11.023678420413653,
+      "epsilon": 0.08,
+      "loss": 26.084461847941082
+    },
+    {
+      "episode": 137,
+      "return": 26.772813706777157,
+      "epsilon": 0.08,
+      "loss": 23.215748388767242
+    },
+    {
+      "episode": 138,
+      "return": 0.75992369322826,
+      "epsilon": 0.08,
+      "loss": 26.332859149575235
+    },
+    {
+      "episode": 139,
+      "return": 47.39714082561144,
+      "epsilon": 0.08,
+      "loss": 26.729208825679308
+    },
+    {
+      "episode": 140,
+      "return": 24.93275367920883,
+      "epsilon": 0.08,
+      "loss": 26.187563828059606
+    },
+    {
+      "episode": 141,
+      "return": 2.5466914077997727,
+      "epsilon": 0.08,
+      "loss": 32.396796226501465
+    },
+    {
+      "episode": 142,
+      "return": 29.754697612140863,
+      "epsilon": 0.08,
+      "loss": 28.761246822498464
+    },
+    {
+      "episode": 143,
+      "return": 45.34877813974676,
+      "epsilon": 0.08,
+      "loss": 28.752325687408447
+    },
+    {
+      "episode": 144,
+      "return": 6.114358726441303,
+      "epsilon": 0.08,
+      "loss": 26.544284184773762
+    },
+    {
+      "episode": 145,
+      "return": 40.305322166870745,
+      "epsilon": 0.08,
+      "loss": 27.192847225666046
+    },
+    {
+      "episode": 146,
+      "return": -18.246301037090188,
+      "epsilon": 0.08,
+      "loss": 28.60952658891678
+    },
+    {
+      "episode": 147,
+      "return": 41.6189332250176,
+      "epsilon": 0.08,
+      "loss": 29.54233433008194
+    },
+    {
+      "episode": 148,
+      "return": 14.694400049988081,
+      "epsilon": 0.08,
+      "loss": 26.263030948638917
+    },
+    {
+      "episode": 149,
+      "return": 8.523577865251433,
+      "epsilon": 0.08,
+      "loss": 28.73085017999013
+    },
+    {
+      "episode": 150,
+      "return": 34.286312275863644,
+      "epsilon": 0.08,
+      "loss": 28.77208904504776
+    },
+    {
+      "episode": 151,
+      "return": -32.95780095595398,
+      "epsilon": 0.08,
+      "loss": 24.96075572490692
+    },
+    {
+      "episode": 152,
+      "return": 52.469285270367365,
+      "epsilon": 0.08,
+      "loss": 30.023904821872712
+    },
+    {
+      "episode": 153,
+      "return": -35.91995010460516,
+      "epsilon": 0.08,
+      "loss": 30.83543892145157
+    },
+    {
+      "episode": 154,
+      "return": 38.872878302338144,
+      "epsilon": 0.08,
+      "loss": 36.07565008339129
+    },
+    {
+      "episode": 155,
+      "return": -58.2952916069081,
+      "epsilon": 0.08,
+      "loss": 32.556749238967896
+    },
+    {
+      "episode": 156,
+      "return": 5.227416074105326,
+      "epsilon": 0.08,
+      "loss": 32.71815164883932
+    },
+    {
+      "episode": 157,
+      "return": 0.44043962468128606,
+      "epsilon": 0.08,
+      "loss": 18.515857696533203
+    },
+    {
+      "episode": 158,
+      "return": 3.082541826248136,
+      "epsilon": 0.08,
+      "loss": 31.234867731730144
+    },
+    {
+      "episode": 159,
+      "return": -22.658443310940843,
+      "epsilon": 0.08,
+      "loss": 32.648426389694215
+    }
+  ],
+  "evaluation": [
+    {
+      "environment_seed": 200001,
+      "policy": "dqn",
+      "return": -86.53077015584626,
+      "steps": 100
+    },
+    {
+      "environment_seed": 200001,
+      "policy": "random",
+      "return": 2.4754304061953265,
+      "steps": 6
+    },
+    {
+      "environment_seed": 200001,
+      "policy": "reward-greedy",
+      "return": 27.06434295416794,
+      "steps": 9
+    },
+    {
+      "environment_seed": 200002,
+      "policy": "dqn",
+      "return": 43.88718449259172,
+      "steps": 100
+    },
+    {
+      "environment_seed": 200002,
+      "policy": "random",
+      "return": 0.12347554176566888,
+      "steps": 2
+    },
+    {
+      "environment_seed": 200002,
+      "policy": "reward-greedy",
+      "return": 2.676562403766003,
+      "steps": 1
+    },
+    {
+      "environment_seed": 200003,
+      "policy": "dqn",
+      "return": 45.43025863327164,
+      "steps": 100
+    },
+    {
+      "environment_seed": 200003,
+      "policy": "random",
+      "return": 2.4537269998908906,
+      "steps": 1
+    },
+    {
+      "environment_seed": 200003,
+      "policy": "reward-greedy",
+      "return": 2.4537269998908906,
+      "steps": 1
+    },
+    {
+      "environment_seed": 200004,
+      "policy": "dqn",
+      "return": 53.11022952079173,
+      "steps": 100
+    },
+    {
+      "environment_seed": 200004,
+      "policy": "random",
+      "return": 0.5642097982814802,
+      "steps": 3
+    },
+    {
+      "environment_seed": 200004,
+      "policy": "reward-greedy",
+      "return": 11.478378831706452,
+      "steps": 5
+    },
+    {
+      "environment_seed": 200005,
+      "policy": "dqn",
+      "return": 40.88835985019674,
+      "steps": 100
+    },
+    {
+      "environment_seed": 200005,
+      "policy": "random",
+      "return": -3.37799217957157,
+      "steps": 36
+    },
+    {
+      "environment_seed": 200005,
+      "policy": "reward-greedy",
+      "return": 4.501988408858695,
+      "steps": 2
+    }
+  ],
+  "weights_sha256": "b957dd88e25dc9e58b3cfcda3c109a73419adc0eb17086addb1c13efd1b1eb5e",
+  "runtime": {
+    "torch": "2.4.1+cpu",
+    "numpy": "1.23.5",
+    "device": "cpu"
+  },
+  "assumptions": [
+    "64x64 hidden layers not specified in thesis",
+    "trajectory training is separated from branching-front simulation",
+    "NDVI interpretation explicitly selected",
+    "floor used for diffusion coefficient",
+    "synthetic environments have no geographic identity"
+  ]
+}

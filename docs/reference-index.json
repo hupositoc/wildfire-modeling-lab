@@ -1,0 +1,502 @@
+[
+  {
+    "repository": "freeCodeCamp/freeCodeCamp",
+    "stars": 457543,
+    "url": "https://github.com/freeCodeCamp/freeCodeCamp",
+    "readme_url": "https://raw.githubusercontent.com/freeCodeCamp/freeCodeCamp/main/README.md",
+    "readme_sha256": "2bee61c3dce3bbf03857760501f5ff886cc368d26eab0ac44af7f6fa360953b9",
+    "fetched_utc": "2026-10-20T05:42:42.060429+00:00",
+    "pattern": "Mission before implementation",
+    "interpretation": "Explains the learning platform and intended audience before contribution mechanics. Adopt a clear user/job statement, not the project’s scale or employment statistics."
+  },
+  {
+    "repository": "openclaw/openclaw",
+    "stars": 392899,
+    "url": "https://github.com/openclaw/openclaw",
+    "readme_url": "https://raw.githubusercontent.com/openclaw/openclaw/main/README.md",
+    "readme_sha256": "d82fbca82ec05d132e0dbbb2c98763fcea56a0f0ce818768b1a9a94776a06411",
+    "fetched_utc": "2026-10-20T05:42:42.170824+00:00",
+    "pattern": "Architecture after a quick start",
+    "interpretation": "Separates installation, system composition, security and development. Adopt a visible boundary between the normal capture workflow and recovery experiments."
+  },
+  {
+    "repository": "morluto/rea",
+    "stars": 339251,
+    "url": "https://github.com/morluto/rea",
+    "readme_url": "https://raw.githubusercontent.com/morluto/rea/main/README.md",
+    "readme_sha256": "d029cf23572c336a965f79d4cfe54d65a87abbbc9047815b97d869a20ac9d249",
+    "fetched_utc": "2026-10-20T05:42:41.825137+00:00",
+    "pattern": "Named technical showcases",
+    "interpretation": "Connects capabilities to concrete reverse-engineering cases. Adopt a case study that traces a real marine test problem through source and output; do not copy its cases."
+  },
+  {
+    "repository": "obra/superpowers",
+    "stars": 302223,
+    "url": "https://github.com/obra/superpowers",
+    "readme_url": "https://raw.githubusercontent.com/obra/superpowers/main/README.md",
+    "readme_sha256": "9b7be460027bf53c29f628eee72dceeebb83e52dd5e94a1b6f9828a64c579198",
+    "fetched_utc": "2026-10-20T05:42:41.869175+00:00",
+    "pattern": "Workflow and failure handling",
+    "interpretation": "Explains how the methodology operates and what to do when it goes wrong. Adopt an explicit operating sequence and a failure-analysis section."
+  },
+  {
+    "repository": "affaan-m/ECC",
+    "stars": 284270,
+    "url": "https://github.com/affaan-m/ECC",
+    "readme_url": "https://raw.githubusercontent.com/affaan-m/ECC/main/README.md",
+    "readme_sha256": "891c1db3e717d893e625c9a87194a2dda07185911019a6e0e8b4c4bfd5d3b92c",
+    "fetched_utc": "2026-10-20T05:42:42.016734+00:00",
+    "pattern": "Choose one installation path",
+    "interpretation": "Warns against stacking incompatible installation approaches. Adopt one primary setup route with alternatives clearly separated; omit promotional density."
+  },
+  {
+    "repository": "NousResearch/hermes-agent",
+    "stars": 255335,
+    "url": "https://github.com/NousResearch/hermes-agent",
+    "readme_url": "https://raw.githubusercontent.com/NousResearch/hermes-agent/main/README.md",
+    "readme_sha256": "62c6d926309728eba97cfe2f266daeab87ce9ebd922e7e4f2756159e431db24e",
+    "fetched_utc": "2026-10-20T05:42:42.170824+00:00",
+    "pattern": "Reference cards for entry points",
+    "interpretation": "Distinguishes CLI/messaging usage and troubleshooting. Adopt a short guide identifying which module to use for a particular test task."
+  },
+  {
+    "repository": "deepseek-ai/deepseek-harness",
+    "stars": 254759,
+    "url": "https://github.com/deepseek-ai/deepseek-harness",
+    "readme_url": "https://raw.githubusercontent.com/deepseek-ai/deepseek-harness/master/README.md",
+    "readme_sha256": "0f5516be2acde776f05572cbc8c3093c90549afe04ce118e11157d073d5d15f4",
+    "fetched_utc": "2026-10-20T05:42:42.128143+00:00",
+    "pattern": "Preview status is prominent",
+    "interpretation": "Calls out developer-preview maturity before execution instructions. Adopt accurate archive/prototype labels instead of implying production readiness."
+  },
+  {
+    "repository": "torvalds/linux",
+    "stars": 252710,
+    "url": "https://github.com/torvalds/linux",
+    "readme_url": "https://raw.githubusercontent.com/torvalds/linux/master/README",
+    "readme_sha256": "d9e6892ff2c83807c34f4aeb06bff724068803d0e03470bfb81a8f5cbde5f090",
+    "fetched_utc": "2026-10-20T05:42:43.348649+00:00",
+    "pattern": "Audience-oriented documentation",
+    "interpretation": "Routes readers by role and links detailed technical documentation. Adopt a recruiter-facing purpose summary and an engineer-facing source walkthrough."
+  },
+  {
+    "repository": "react/react",
+    "stars": 251452,
+    "url": "https://github.com/react/react",
+    "readme_url": "https://raw.githubusercontent.com/react/react/main/README.md",
+    "readme_sha256": "9b6ac13cb03c06ae5643376cebd8d0e6cbae7ec0dd30a5cdc443a93160c348eb",
+    "fetched_utc": "2026-10-20T05:42:42.533448+00:00",
+    "pattern": "Benefits tied to mechanisms",
+    "interpretation": "Pairs user-facing properties with programming concepts and examples. Adopt an explanation of why state separation or explicit API calls matter."
+  },
+  {
+    "repository": "anomalyco/opencode",
+    "stars": 218045,
+    "url": "https://github.com/anomalyco/opencode",
+    "readme_url": "https://raw.githubusercontent.com/anomalyco/opencode/dev/README.md",
+    "readme_sha256": "977e6c3f56bca4e93c44309dc61fa3988d43913ee8b747a47af2e9717b8b86f6",
+    "fetched_utc": "2026-10-20T05:42:42.534463+00:00",
+    "pattern": "Separate product surfaces",
+    "interpretation": "Distinguishes package-manager, desktop and agent entry points. Adopt clear separation between the GUI scheduler, Python extension and host-specific components."
+  },
+  {
+    "repository": "vuejs/vue",
+    "stars": 212705,
+    "url": "https://github.com/vuejs/vue",
+    "readme_url": "https://raw.githubusercontent.com/vuejs/vue/main/README.md",
+    "readme_sha256": "a9abe8e795aaa122e6ef5d4ca34f323778e727112bcbec4e06b960541cc0df61",
+    "fetched_utc": "2026-10-20T05:42:42.534463+00:00",
+    "pattern": "Lifecycle honesty",
+    "interpretation": "Places end-of-life status ahead of historical popularity. Adopt explicit archive limitations and a migration path for the RoutineStamp source package."
+  },
+  {
+    "repository": "n8n-io/n8n",
+    "stars": 208077,
+    "url": "https://github.com/n8n-io/n8n",
+    "readme_url": "https://raw.githubusercontent.com/n8n-io/n8n/master/README.md",
+    "readme_sha256": "75c64f04b8b1e7d435496f6ebd2dbf3ea5ff7d3ff3d944d7fcf98cf1a7df2242",
+    "fetched_utc": "2026-10-20T05:42:42.490569+00:00",
+    "pattern": "Workflow outcome framing",
+    "interpretation": "Explains what users can build and which integrations are available. Adopt task-oriented outcomes rather than a technology-only inventory."
+  },
+  {
+    "repository": "tensorflow/tensorflow",
+    "stars": 201204,
+    "url": "https://github.com/tensorflow/tensorflow",
+    "readme_url": "https://raw.githubusercontent.com/tensorflow/tensorflow/master/README.md",
+    "readme_sha256": "e2f779cef212fbc54c3f9b1e273583720edac1ac9cc6ce6813b1e0386a968f0d",
+    "fetched_utc": "2026-10-20T05:42:42.959599+00:00",
+    "pattern": "Small first program plus build evidence",
+    "interpretation": "Provides a minimal runnable example and links build/support material. Adopt executable checks without treating them as proof of device-level integration."
+  },
+  {
+    "repository": "yt-dlp/yt-dlp",
+    "stars": 199541,
+    "url": "https://github.com/yt-dlp/yt-dlp",
+    "readme_url": "https://raw.githubusercontent.com/yt-dlp/yt-dlp/master/README.md",
+    "readme_sha256": "357f718a94c879bfcc7d647a8ea2d192d5abeee6a784c74d5bff2f4e518e00ee",
+    "fetched_utc": "2026-10-20T05:42:43.079843+00:00",
+    "pattern": "Operational reference depth",
+    "interpretation": "Organizes extensive installation, dependency and option material. Keep the project introduction readable and put detailed operating reference in linked documents."
+  },
+  {
+    "repository": "trekhleb/javascript-algorithms",
+    "stars": 196685,
+    "url": "https://github.com/trekhleb/javascript-algorithms",
+    "readme_url": "https://raw.githubusercontent.com/trekhleb/javascript-algorithms/master/README.md",
+    "readme_sha256": "4954acce8f13ba41d5592cfbef66d0f1d345601d6f873a74fa6c3757ee663dcf",
+    "fetched_utc": "2026-10-20T05:42:42.961567+00:00",
+    "pattern": "Explanation beside implementation",
+    "interpretation": "Links individual algorithms to their own explanations and complexity material. Adopt direct links from a design claim to the relevant source symbol."
+  },
+  {
+    "repository": "microsoft/vscode",
+    "stars": 194041,
+    "url": "https://github.com/microsoft/vscode",
+    "readme_url": "https://raw.githubusercontent.com/microsoft/vscode/main/README.md",
+    "readme_sha256": "45a411a3b8d49556fbaa73601befc458ab10ad873fca9088136888c89abb8935",
+    "fetched_utc": "2026-10-20T05:42:42.960568+00:00",
+    "pattern": "Source versus product distinction",
+    "interpretation": "Explains the relationship between the open source tree and the distributed editor. Adopt a clear distinction between an archived source package and a tested release artifact."
+  },
+  {
+    "repository": "firecrawl/firecrawl",
+    "stars": 193155,
+    "url": "https://github.com/firecrawl/firecrawl",
+    "readme_url": "https://raw.githubusercontent.com/firecrawl/firecrawl/main/README.md",
+    "readme_sha256": "13ac2f319b675696004dc004f4e32084d08f138151424499f7239d2b9f0d8a67",
+    "fetched_utc": "2026-10-20T05:42:43.257556+00:00",
+    "pattern": "Minimal API examples",
+    "interpretation": "Shows concrete calls near the feature overview. Adopt small usage examples that demonstrate the project-specific behavior, not a generic dependency tutorial."
+  },
+  {
+    "repository": "microsoft/markitdown",
+    "stars": 191159,
+    "url": "https://github.com/microsoft/markitdown",
+    "readme_url": "https://raw.githubusercontent.com/microsoft/markitdown/main/README.md",
+    "readme_sha256": "9f9dc0e582d066e8ac671a1f63b3a73c70a7be9909e8be51a7f5aeb5a7c04af2",
+    "fetched_utc": "2026-10-20T05:42:43.309586+00:00",
+    "pattern": "Purpose and I/O boundary",
+    "interpretation": "Explains conversion purpose, prerequisites, usage and process privileges. Adopt precise input/output boundaries and avoid claiming untested document or device support."
+  },
+  {
+    "repository": "ohmyzsh/ohmyzsh",
+    "stars": 190080,
+    "url": "https://github.com/ohmyzsh/ohmyzsh",
+    "readme_url": "https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/README.md",
+    "readme_sha256": "50c4dbf1674d850707601b1124ec6eaffebe29ba48696a79094b6f1454583393",
+    "fetched_utc": "2026-10-20T05:42:43.432447+00:00",
+    "pattern": "Benefit-led introduction",
+    "interpretation": "Connects a configuration framework to everyday convenience. Adopt the link between repeated work and saved interaction, without copying its humorous marketing voice."
+  },
+  {
+    "repository": "Significant-Gravitas/AutoGPT",
+    "stars": 187665,
+    "url": "https://github.com/Significant-Gravitas/AutoGPT",
+    "readme_url": "https://raw.githubusercontent.com/Significant-Gravitas/AutoGPT/master/README.md",
+    "readme_sha256": "5e8b890b94d97d55260792c60b4db01c8aeaf9a83e100171c78b444d1e5e598f",
+    "fetched_utc": "2026-10-20T05:42:43.390458+00:00",
+    "pattern": "Multiple deployment surfaces",
+    "interpretation": "Separates capabilities, hosted/self-hosted paths and example workflows. Adopt capability/implementation distinctions; do not transfer its commercial outcome claims."
+  },
+  {
+    "repository": "ollama/ollama",
+    "stars": 183893,
+    "url": "https://github.com/ollama/ollama",
+    "readme_url": "https://raw.githubusercontent.com/ollama/ollama/main/README.md",
+    "readme_sha256": "9e5a7d406950fdd2742084065ab38a3ea09b5aab5e2f13ef7d64147229ae0d8b",
+    "fetched_utc": "2026-10-20T05:42:43.594907+00:00",
+    "pattern": "Platform-specific onboarding",
+    "interpretation": "Presents installation by platform and short model/API examples. Adopt explicit environment requirements and a primary start command."
+  },
+  {
+    "repository": "flutter/flutter",
+    "stars": 180302,
+    "url": "https://github.com/flutter/flutter",
+    "readme_url": "https://raw.githubusercontent.com/flutter/flutter/master/README.md",
+    "readme_sha256": "4bc9b330ef1c690f06adb0f90c25018c980977ad47d25d88efca11f45e91930a",
+    "fetched_utc": "2026-10-20T05:42:43.662045+00:00",
+    "pattern": "User value connected to developer experience",
+    "interpretation": "Explains visual, performance and extensibility goals. Adopt the relation between a small app’s user loop and the code supporting it, without inheriting SDK-level claims."
+  },
+  {
+    "repository": "twbs/bootstrap",
+    "stars": 175025,
+    "url": "https://github.com/twbs/bootstrap",
+    "readme_url": "https://raw.githubusercontent.com/twbs/bootstrap/main/README.md",
+    "readme_sha256": "0b36e6727671530e70b3ea45911fad44aa8beaa64e0dc2dd1e8ebfd727d890fe",
+    "fetched_utc": "2026-10-20T05:42:43.738948+00:00",
+    "pattern": "Version-aware entry points",
+    "interpretation": "Separates the active development branch from prior stable documentation. Adopt clear version labeling for mixed archive/build-note versions."
+  },
+  {
+    "repository": "f/prompts.chat",
+    "stars": 173600,
+    "url": "https://github.com/f/prompts.chat",
+    "readme_url": "https://raw.githubusercontent.com/f/prompts.chat/main/README.md",
+    "readme_sha256": "02747c003e45fd275c0ebd8093e00f4d2a063feade7853a86bd7e0973739e9e5",
+    "fetched_utc": "2026-10-20T05:42:43.700072+00:00",
+    "pattern": "Showcase and self-host paths",
+    "interpretation": "Combines a project story with integrations and a deployment path. Adopt purpose and a reproducible path; external endorsements and community size are not transferable evidence."
+  },
+  {
+    "repository": "huggingface/transformers",
+    "stars": 167880,
+    "url": "https://github.com/huggingface/transformers",
+    "readme_url": "https://raw.githubusercontent.com/huggingface/transformers/main/README.md",
+    "readme_sha256": "2a177841823df1ce1ad7ec068f07809eeb39d8db336ecab0fec259ddaf488ecb",
+    "fetched_utc": "2026-10-20T05:42:44.224764+00:00",
+    "pattern": "Scope includes when not to use it",
+    "interpretation": "Offers quick start, use-case scope and citations. Adopt a clear account of what a timing analyzer or synthetic research benchmark cannot establish."
+  },
+  {
+    "repository": "AUTOMATIC1111/stable-diffusion-webui",
+    "stars": 165081,
+    "url": "https://github.com/AUTOMATIC1111/stable-diffusion-webui",
+    "readme_url": "https://raw.githubusercontent.com/AUTOMATIC1111/stable-diffusion-webui/master/README.md",
+    "readme_sha256": "bd853b26858ab8f5065d2e6b90b3552ff8f169977140f3b77a96ed1753bfe916",
+    "fetched_utc": "2026-10-20T05:42:43.904590+00:00",
+    "pattern": "Concrete platform requirements",
+    "interpretation": "Documents operating-system and hardware setup differences. Adopt dependency constraints and distinguish an installation recipe from a locally executed build."
+  },
+  {
+    "repository": "langgenius/dify",
+    "stars": 158964,
+    "url": "https://github.com/langgenius/dify",
+    "readme_url": "https://raw.githubusercontent.com/langgenius/dify/main/README.md",
+    "readme_sha256": "3c7fe487f1e89e6faec52f5421c71e749c1cecc3486725be3e03fb3fbb62e484",
+    "fetched_utc": "2026-10-20T05:42:43.954809+00:00",
+    "pattern": "Resource requirements before deployment",
+    "interpretation": "States minimum resources and a primary deployment route. Adopt prerequisites close to setup rather than hiding them in a long appendix."
+  },
+  {
+    "repository": "open-webui/open-webui",
+    "stars": 156221,
+    "url": "https://github.com/open-webui/open-webui",
+    "readme_url": "https://raw.githubusercontent.com/open-webui/open-webui/main/README.md",
+    "readme_sha256": "da3d46f4d7e6c158e13ed91e5e46250d22d278b972d8d1b028f5e0bb62be612b",
+    "fetched_utc": "2026-10-20T05:42:43.996827+00:00",
+    "pattern": "Feature/deployment separation",
+    "interpretation": "Separates the feature inventory, installation methods and troubleshooting. Adopt a task-based feature list with integration status for each host environment."
+  },
+  {
+    "repository": "langflow-ai/langflow",
+    "stars": 155857,
+    "url": "https://github.com/langflow-ai/langflow",
+    "readme_url": "https://raw.githubusercontent.com/langflow-ai/langflow/main/README.md",
+    "readme_sha256": "2db8b7380f9675c287418f208e5011aa5f64289b1d2001ef43e3c96d03aeca33",
+    "fetched_utc": "2026-10-20T05:42:44.037575+00:00",
+    "pattern": "Visual authoring tied to runtime outputs",
+    "interpretation": "Links the user’s workflow-building experience to API/MCP deployment. Adopt diagrams that explain where a user action becomes a durable output."
+  },
+  {
+    "repository": "anthropics/claude-code",
+    "stars": 152757,
+    "url": "https://github.com/anthropics/claude-code",
+    "readme_url": "https://raw.githubusercontent.com/anthropics/claude-code/main/README.md",
+    "readme_sha256": "aa0d8b80ac083e1591be0789273f447058cc9187b4331634a5614155da27778d",
+    "fetched_utc": "2026-10-20T05:42:44.264194+00:00",
+    "pattern": "Data handling is part of the story",
+    "interpretation": "Places onboarding alongside data-use information. Adopt a short public-data boundary for test logs; do not claim the same provider policies."
+  },
+  {
+    "repository": "Genymobile/scrcpy",
+    "stars": 152584,
+    "url": "https://github.com/Genymobile/scrcpy",
+    "readme_url": "https://raw.githubusercontent.com/Genymobile/scrcpy/master/README.md",
+    "readme_sha256": "1a2f2677b4b86c0879b68a5b23c24fa7268ac3af1a92a17bddbe137abf374549",
+    "fetched_utc": "2026-10-20T05:42:44.303248+00:00",
+    "pattern": "Prerequisites plus useful commands",
+    "interpretation": "Uses setup requirements and practical usage examples. Adopt a short route from supported input to an inspectable output before the extended technical discussion."
+  },
+  {
+    "repository": "clash-verge-rev/clash-verge-rev",
+    "stars": 152578,
+    "url": "https://github.com/clash-verge-rev/clash-verge-rev",
+    "readme_url": "https://raw.githubusercontent.com/clash-verge-rev/clash-verge-rev/dev/README.md",
+    "readme_sha256": "d2a8171e5c7f7c62efa2d1a6412baff680fefdfa851f945143c5d7fe66fd49d2",
+    "fetched_utc": "2026-10-20T05:42:44.304823+00:00",
+    "pattern": "Preview, install and development",
+    "interpretation": "Includes preview media and developer instructions, but also significant promotions. Adopt a real screenshot only after it exists; reject promotional clutter."
+  },
+  {
+    "repository": "langchain-ai/langchain",
+    "stars": 148102,
+    "url": "https://github.com/langchain-ai/langchain",
+    "readme_url": "https://raw.githubusercontent.com/langchain-ai/langchain/master/README.md",
+    "readme_sha256": "9e6d706b38215c6979ef398ba72181b0f9099b8150f317c4c221877456c2dc2e",
+    "fetched_utc": "2026-10-20T05:42:44.381677+00:00",
+    "pattern": "Explain the component boundary",
+    "interpretation": "Uses a compact start and links the broader ecosystem. Adopt a focused README with links to deeper architecture, not an attempt to document every dependency inline."
+  },
+  {
+    "repository": "farion1231/cc-switch",
+    "stars": 146495,
+    "url": "https://github.com/farion1231/cc-switch",
+    "readme_url": "https://raw.githubusercontent.com/farion1231/cc-switch/main/README.md",
+    "readme_sha256": "99f96c19ce40c2d718e5bfe612869359d15a25f6a44a0c329b9e0120b6db2765",
+    "fetched_utc": "2026-10-20T05:42:44.585146+00:00",
+    "pattern": "Problem statement before screenshots",
+    "interpretation": "Explains why the manager exists, then requirements and operation. Adopt why-this-tool and what-it-enabled sections before interface detail."
+  },
+  {
+    "repository": "vercel/next.js",
+    "stars": 143098,
+    "url": "https://github.com/vercel/next.js",
+    "readme_url": "https://raw.githubusercontent.com/vercel/next.js/canary/readme.md",
+    "readme_sha256": "86fa4cae97d711fd7d23ac4189750e63011f2cf7fca8f844d4caa4a5484a8e3d",
+    "fetched_utc": "2026-10-20T05:42:45.015123+00:00",
+    "pattern": "Documentation and showcase routing",
+    "interpretation": "The root README is a path pointer; the actual package README routes readers to learning, examples and contribution material. Follow the pointer rather than counting it as a substantive review."
+  },
+  {
+    "repository": "github/spec-kit",
+    "stars": 141994,
+    "url": "https://github.com/github/spec-kit",
+    "readme_url": "https://raw.githubusercontent.com/github/spec-kit/main/README.md",
+    "readme_sha256": "3791fed409fa037ad80a4941b77c3c12d6f4f44367fc6e73b970734e0bb3fc2a",
+    "fetched_utc": "2026-10-20T05:42:44.678513+00:00",
+    "pattern": "Choose a process by job",
+    "interpretation": "Organizes independent processes around the user’s task. Adopt a module-selection table for scheduled logging, decoding, liveness and pulse generation."
+  },
+  {
+    "repository": "ytdl-org/youtube-dl",
+    "stars": 141343,
+    "url": "https://github.com/ytdl-org/youtube-dl",
+    "readme_url": "https://raw.githubusercontent.com/ytdl-org/youtube-dl/master/README.md",
+    "readme_sha256": "dc249af3a7587ad18dce6d22f6e486ac0af6f91fe1172e7e866bae584e0c73cb",
+    "fetched_utc": "2026-10-20T05:42:44.680529+00:00",
+    "pattern": "Reproducible bug-report expectations",
+    "interpretation": "Provides a detailed operating reference and problem-report guidance. Adopt configuration/input/expected/actual fields in validation documentation."
+  },
+  {
+    "repository": "Comfy-Org/ComfyUI",
+    "stars": 139981,
+    "url": "https://github.com/Comfy-Org/ComfyUI",
+    "readme_url": "https://raw.githubusercontent.com/Comfy-Org/ComfyUI/master/README.md",
+    "readme_sha256": "d812a66af88fe0a08d25d19c2dba3b6ce604ce364f88b1e315c13587d6f7a2eb",
+    "fetched_utc": "2026-10-20T05:42:44.679525+00:00",
+    "pattern": "Explicit installation alternatives",
+    "interpretation": "Separates desktop, manual and portable execution and explains workflow examples. Adopt clear platform paths and do not imply that all paths were executed."
+  },
+  {
+    "repository": "microsoft/PowerToys",
+    "stars": 139497,
+    "url": "https://github.com/microsoft/PowerToys",
+    "readme_url": "https://raw.githubusercontent.com/microsoft/PowerToys/main/README.md",
+    "readme_sha256": "e7174a2223b22690491aa6992a1f448a5851ce12bf81a8a50a78d20a84eed82e",
+    "fetched_utc": "2026-10-20T05:42:44.891432+00:00",
+    "pattern": "A suite organized by utility",
+    "interpretation": "Presents many tools as task-specific entries. Adopt a grouped suite where scheduler and watchdog have distinct purposes, rather than merging their claims."
+  },
+  {
+    "repository": "golang/go",
+    "stars": 139416,
+    "url": "https://github.com/golang/go",
+    "readme_url": "https://raw.githubusercontent.com/golang/go/master/README.md",
+    "readme_sha256": "8247b7c5de1e74854aac1a08aa5894444d1d33b4045c70d5cc3367ad0e25c3f3",
+    "fetched_utc": "2026-10-20T05:42:45.057123+00:00",
+    "pattern": "Concise front door to deeper docs",
+    "interpretation": "Keeps the main introduction short and routes source-build and contribution needs separately. Adopt progressive disclosure without omitting important project evidence."
+  },
+  {
+    "repository": "excalidraw/excalidraw",
+    "stars": 134217,
+    "url": "https://github.com/excalidraw/excalidraw",
+    "readme_url": "https://raw.githubusercontent.com/excalidraw/excalidraw/master/README.md",
+    "readme_sha256": "011eea74cbbf38fd263ec93a221f379466c557dc7587acfe93797201193a7e7a",
+    "fetched_utc": "2026-10-20T05:42:45.057123+00:00",
+    "pattern": "Library versus showcase application",
+    "interpretation": "Distinguishes the reusable package from the hosted example built with it. Adopt a distinction between architecture illustrations, runnable code and actual application screenshots."
+  },
+  {
+    "repository": "ggml-org/llama.cpp",
+    "stars": 131757,
+    "url": "https://github.com/ggml-org/llama.cpp",
+    "readme_url": "https://raw.githubusercontent.com/ggml-org/llama.cpp/master/README.md",
+    "readme_sha256": "dc2d34687c844ecf929d9e9a9c9c78e8023b52abf3b2b3d039600c79016673b6",
+    "fetched_utc": "2026-10-20T05:42:45.057123+00:00",
+    "pattern": "Backend and capability boundaries",
+    "interpretation": "Separates quick start, supported backends and development details. Adopt explicit host/toolchain support for C++ analyzers and research code."
+  },
+  {
+    "repository": "openai/codex",
+    "stars": 129982,
+    "url": "https://github.com/openai/codex",
+    "readme_url": "https://raw.githubusercontent.com/openai/codex/main/README.md",
+    "readme_sha256": "ba4e1f69ff48386e72a9c5e1edaf76aad64a475c2d51af79ccba6d1128261ba7",
+    "fetched_utc": "2026-10-20T05:42:45.229029+00:00",
+    "pattern": "Entry-point choice",
+    "interpretation": "Routes CLI, editor, app and cloud readers to the right surface. Adopt a clear task-to-entry-point guide; this is a documentation observation, not advice about those products."
+  },
+  {
+    "repository": "kubernetes/kubernetes",
+    "stars": 128489,
+    "url": "https://github.com/kubernetes/kubernetes",
+    "readme_url": "https://raw.githubusercontent.com/kubernetes/kubernetes/master/README.md",
+    "readme_sha256": "0c1159ea384aa0855eaad87f4595da8fd776553830297f3a7c43db81c7708fbd",
+    "fetched_utc": "2026-10-20T05:42:45.377328+00:00",
+    "pattern": "User versus developer onboarding",
+    "interpretation": "Separates starting to use the system from developing it. Adopt a practical operator workflow plus a source-level engineering walkthrough."
+  },
+  {
+    "repository": "react/react-native",
+    "stars": 126726,
+    "url": "https://github.com/react/react-native",
+    "readme_url": "https://raw.githubusercontent.com/react/react-native/main/README.md",
+    "readme_sha256": "cd1286873f4079182c25b5a0b37560ad780c4c0706d78b91ea2afa64f8bcfd76",
+    "fetched_utc": "2026-10-20T05:42:45.472488+00:00",
+    "pattern": "Architecture benefits and platform behavior",
+    "interpretation": "Connects framework concepts to native UI and developer workflow. Adopt technical explanations that connect implementation choices to the task being solved."
+  },
+  {
+    "repository": "rustdesk/rustdesk",
+    "stars": 126372,
+    "url": "https://github.com/rustdesk/rustdesk",
+    "readme_url": "https://raw.githubusercontent.com/rustdesk/rustdesk/master/README.md",
+    "readme_sha256": "ab807f3979b010903e7b72d42d6612935e70fcc1b8c8392a7bb7c47b979ba2b0",
+    "fetched_utc": "2026-10-20T05:42:45.416994+00:00",
+    "pattern": "Source map and screenshots",
+    "interpretation": "Provides dependencies, build paths, file structure and screenshots. Adopt a source responsibility table and only publish real captures labeled as such."
+  },
+  {
+    "repository": "shadcn-ui/ui",
+    "stars": 125990,
+    "url": "https://github.com/shadcn-ui/ui",
+    "readme_url": "https://raw.githubusercontent.com/shadcn-ui/ui/main/README.md",
+    "readme_sha256": "bb0869848a2063e405b141aa6fae8b10f132ac45036f613459e2d778b7609619",
+    "fetched_utc": "2026-10-20T05:42:45.416994+00:00",
+    "pattern": "An intentionally short README",
+    "interpretation": "Uses a small description with links to full documentation. This is a useful counterexample: popularity does not mean the shortest README fits a detailed project documentation."
+  },
+  {
+    "repository": "electron/electron",
+    "stars": 123416,
+    "url": "https://github.com/electron/electron",
+    "readme_url": "https://raw.githubusercontent.com/electron/electron/main/README.md",
+    "readme_sha256": "cb788749d3f0d3991e9c17b0cbcd9fd15a8c9bd73e45874d0a936fdbd9d3745b",
+    "fetched_utc": "2026-10-20T05:42:45.538025+00:00",
+    "pattern": "Support matrix and code entry points",
+    "interpretation": "Pairs installation with platform support and programmatic use. Adopt exact prerequisites and code-level entry points for reviewers."
+  },
+  {
+    "repository": "nodejs/node",
+    "stars": 122527,
+    "url": "https://github.com/nodejs/node",
+    "readme_url": "https://raw.githubusercontent.com/nodejs/node/main/README.md",
+    "readme_sha256": "82c4b8ac5dc20ed616402695123295da74854956de6b9768c26699d610dadf45",
+    "fetched_utc": "2026-10-20T05:42:45.652500+00:00",
+    "pattern": "Release/support and binary verification",
+    "interpretation": "Distinguishes release channels, support, builds and verification. Adopt traceable experiment/configuration/checkpoint records instead of unverifiable outcome badges."
+  },
+  {
+    "repository": "othneildrew/Best-README-Template",
+    "stars": 16409,
+    "url": "https://github.com/othneildrew/Best-README-Template",
+    "readme_url": "https://raw.githubusercontent.com/othneildrew/Best-README-Template/main/README.md",
+    "readme_sha256": "bbd539c6afb1ad1240bca5e8c6fea66645201eb728bebf219ffb8e11f85748ac",
+    "fetched_utc": "2026-10-20T05:42:46.097578+00:00",
+    "pattern": "Explicit reusable outline",
+    "interpretation": "Provides the About/Built With/Getting Started/Usage/Roadmap/Contributing/License/Contact/Acknowledgments structure. Adopt this section order directly, attribute it and write original project-specific content."
+  }
+]

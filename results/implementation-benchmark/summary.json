@@ -1,0 +1,53 @@
+{
+  "runs": 6,
+  "total_episodes": 960,
+  "total_updates": 28127,
+  "training_seconds": 170.03300430000002,
+  "summaries": [
+    {
+      "ndvi_mode": "literal",
+      "policy": "dqn",
+      "mean_return": 0.10140887673587902,
+      "sd_return": 67.18073354644507,
+      "evaluation_pairs": 15
+    },
+    {
+      "ndvi_mode": "literal",
+      "policy": "random",
+      "mean_return": 0.9195029626704095,
+      "sd_return": 2.23464410390037,
+      "evaluation_pairs": 15
+    },
+    {
+      "ndvi_mode": "literal",
+      "policy": "reward-greedy",
+      "mean_return": 9.634999919677997,
+      "sd_return": 9.638298438396209,
+      "evaluation_pairs": 15
+    },
+    {
+      "ndvi_mode": "raw",
+      "policy": "dqn",
+      "mean_return": 93.54621211153375,
+      "sd_return": 108.60841768136555,
+      "evaluation_pairs": 15
+    },
+    {
+      "ndvi_mode": "raw",
+      "policy": "random",
+      "mean_return": 9.138222919435783,
+      "sd_return": 10.725675552699737,
+      "evaluation_pairs": 15
+    },
+    {
+      "ndvi_mode": "raw",
+      "policy": "reward-greedy",
+      "mean_return": 13.367271790135407,
+      "sd_return": 13.192852792795865,
+      "evaluation_pairs": 15
+    }
+  ],
+  "reported_thesis_iou": 0.726,
+  "reproduced_real_event_iou": null,
+  "synthetic_is_not_observation": true
+}

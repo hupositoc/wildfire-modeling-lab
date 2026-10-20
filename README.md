@@ -1,34 +1,160 @@
-# Wildfire Modeling Lab | 산불 확산·학습 실험
+<a id="readme-top"></a>
 
-지리 격자·식생·바람 데이터를 바탕으로 GPR 보간과 산불 확산 모사, DQN 환경 구성을 탐색한 MATLAB 연구 코드다.
+![Wildfire Modeling Lab: thesis reconstruction workflow](docs/assets/overview.svg)
 
-## 기술과 구성
+# Wildfire Modeling Lab
 
-MATLAB · GPR · DQN · Reinforcement Learning Toolbox
+**From a historical research result to an auditable implementation and evaluation protocol.**
 
-```text
-gpr/: 풍향·풍속 보간과 확산 모사 실험
-reinforcement-learning/: 단일·다중 에이전트 환경과 학습 스크립트
+This project investigates whether an environmental-reward DQN can reproduce spatial wildfire progression. It builds on my 2025 master's thesis, *Wildfire Spread Prediction Using Reinforcement Learning and Environmental Variables*, and now separates the historical thesis claim from newly executed software checks and the still-unverified real-event score.
+
+| At a glance | |
+|---|---|
+| Research target | Uljin 2022 wildfire, with an additional Uiseong–Andong case described in the thesis |
+| Thesis-reported result | Jaccard/IoU **0.726** for one reward-weight setting |
+| Newly executed work | **6 DQN training runs, 960 episodes, 28,127 gradient updates**, synthetic inputs |
+| Real-event reproduction | **Not yet established**; original mask/data and implementation ambiguities remain |
+| Stack | Python, PyTorch, NumPy, MATLAB research archive, Earth Engine export helper |
+
+[Research case study](docs/case-study.md) · [Full thesis audit](docs/thesis-reproduction-audit.md) · [Architecture](docs/architecture.md) · [Results](docs/experiment-results.md) · [Data reconstruction](data/README.md)
+
+## Table of Contents
+
+- [About The Project](#about-the-project)
+- [Getting Started](#getting-started)
+- [Usage](#usage)
+- [Roadmap](#roadmap)
+- [Contributing](#contributing)
+- [License](#license)
+- [Contact](#contact)
+- [Acknowledgments](#acknowledgments)
+
+## About The Project
+
+### Why I developed it
+
+The research question is spatial progression after ignition: given environmental conditions, which neighboring cells does a learned policy favor, and how similar is the resulting footprint to an independently observed burned area? This is different from predicting whether a fire starts, placing firefighting resources or issuing an operational emergency forecast.
+
+The original research used environmental information—temperature/humidity-derived equilibrium moisture, vegetation, wind and terrain—to shape the reward. The thesis reports an Uljin overlap score and a transfer case. The current engineering work asks a stricter question: can a reviewer identify the model, recover its inputs, run the training and independently check the reported score?
+
+### What this enabled
+
+- Define a 50×50 geographic grid, an ignition cell and nine possible moves, including staying.
+- Connect environmental hypotheses to an explicit weighted reward and a learned action-value function.
+- Compare simulated footprints with a spatial overlap metric rather than relying only on visual similarity.
+- Identify and document the gap between a historical fitted result and a repeatable independent evaluation.
+
+The thesis describes the first three research activities. The new audit, input contracts, unit tests, runnable PyTorch training and saved experiment logs make the fourth activity inspectable. The current implementation has not been validated for operational wildfire warning.
+
+### Built With
+
+Python 3.8.10, PyTorch 2.4.1+cpu, NumPy 1.23.5, SciPy 1.10.1 and Matplotlib 3.7.5 were used for the new runs. The older MATLAB scripts are retained as historical exploration, not relabeled as the recovered final thesis code.
+
+### Model and technical decisions
+
+The reward combines moisture, vegetation, slope alignment and wind alignment. A multilayer perceptron estimates nine Q-values from grid coordinates and six environmental features. Replay sampling, a target network, epsilon-greedy exploration, finite episodes and MSE TD loss are implemented explicitly.
+
+The thesis specifies several components but not every implementation detail. The new 64×64 hidden layers and optimizer settings are documented reconstruction choices. Equation 3.7's NDVI units and equation 3.12's floor/ceiling conflict remain unresolved; experiments keep the printed and alternative NDVI interpretations separate.
+
+### Code to inspect
+
+| Entry point | What it makes inspectable |
+|---|---|
+| [`wildfire/model.py`](wildfire/model.py) | Units, coordinate convention, reward, adjacent transitions and IoU |
+| [`wildfire/experiment.py`](wildfire/experiment.py) | Actual replay/target-network DQN training and checkpoint/log output |
+| [`wildfire/rollout.py`](wildfire/rollout.py) | Separate parallel ignition-front reconstruction and provenance-gated scoring |
+| [`wildfire/verify_thesis.py`](wildfire/verify_thesis.py) | Frozen checkpoint/mask hashes and observed-score calculation |
+| [`data/prepare_dataset.py`](data/prepare_dataset.py) | Explicit CSV-to-tensor reconstruction without inventing labels |
+| [`tests/test_model.py`](tests/test_model.py) | Boundary, units, barrier, terminal, provenance and metric behavior |
+
+### AI-assisted engineering
+
+AI development tools assist implementation and review, while the scientific claim depends on data provenance, a frozen protocol and actual evaluation. Writing a training script is not the same as recovering a model, and increasing reward is not the same as improving real-event spatial accuracy. These distinctions are part of the engineering work presented here.
+
+## Getting Started
+
+### Prerequisites
+
+Python and the pinned packages in `requirements.txt`. CPU execution is supported. MATLAB is needed only for exploring the archived `.m` scripts. The Earth Engine source-reconstruction helper requires the user's authorized Earth Engine environment; it was not executed against an authenticated account here.
+
+### Installation
+
+```powershell
+git clone https://github.com/hupositoc/wildfire-modeling-lab.git
+cd wildfire-modeling-lab
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
 ```
 
-## 엔지니어링 관점
+Run tests and the declared implementation benchmark:
 
-커널 기반 회귀 구현, 격자 데이터 구성, 관측·행동·보상 설계와 학습 루프. DQN 네트워크·학습 코드는 확인되지만 학습 성능이나 예측 정확도를 입증하는 재현 결과는 확인하지 못했다.
+```powershell
+python -m unittest discover -s tests -v
+python -m wildfire.experiment --episodes 160 --seeds 7 19 43
+python tools/render_report.py
+```
 
-## AI를 활용한 개발 방식
+These commands generate synthetic environmental inputs. They do not recreate the original satellite-derived target or establish IoU 0.726. The recorded package versions and seeds support reproducibility on the same software stack; cross-platform bitwise identity is not promised.
 
-이 프로젝트는 AI 개발 도구를 활용한 문제 해결 포트폴리오의 일부다. AI가 코드를 작성했다는 사실보다 문제 정의, 기술 선택, 결과 검토, 실패 원인 분석과 검증 근거를 중심으로 설명한다. 원본 개발 대화 전체는 확인하지 못했으므로 파일별 수작업·AI 작성 비율이나 사용 모델은 추정하지 않는다.
+## Usage
 
-## 시작하기
+![Thesis audit, input reconstruction, training and observed-mask evaluation](docs/assets/workflow.svg)
 
-MATLAB과 Reinforcement Learning Toolbox가 필요하다. `gpr/`와 `reinforcement-learning/`는 서로 다른 탐색 실험 폴더다. 재현에 필요한 데이터 출처·스키마를 확정하기 전에는 `train_DQN.m` 실행이 완결되지 않는다. 학습 완료 모델이나 검증된 추론 API는 포함하지 않는다.
+**Text equivalent:** audit the thesis → reconstruct environmental inputs → train and inspect a policy → evaluate a frozen model against an independently sourced mask.
 
-## 실행과 현재 상태
+### What actually ran
 
-탐색적 연구 아카이브다. 다중 에이전트 환경의 reward/isDone 처리는 미완성이고, train_DQN.m이 요구하는 generated_weather_data.csv가 원본 폴더에 없다. 출처·이용 조건이 불명확한 데이터와 MAT 세션은 공개 묶음에서 제외했다. 완료된 AI 모델·검증된 재난 예측 시스템으로 소개하지 않는다.
+Two NDVI interpretations were each trained with seeds 7, 19 and 43 for 160 episodes. Every network was evaluated on five fixed synthetic environments withheld from the training generator's seed range. The evaluation includes random and immediate-reward policies. Raw logs, checkpoints and digests are in [`results/implementation-benchmark`](results/implementation-benchmark).
 
-이번 공개 준비에서는 원본의 선별 복사와 정적 점검을 수행했다. 지원 도구·장비가 없는 환경에서 실행 성공, 운영 성과, 모델 정확도를 새로 확인한 것으로 주장하지 않는다. 상세 검증 결과는 `VALIDATION.md`에 기록한다.
+![Actual recorded training returns, with mean and descriptive seed variability](docs/assets/training-returns.png)
 
-## 출처·공개 범위
+![Actual policy returns; these are not burned-area accuracy measurements](docs/assets/policy-returns.png)
 
-원본 작업 폴더에서 소스를 선별한 공개 준비본이다. 로그·자격증명·로컬 SDK 경로·실제 업무 데이터·실행 바이너리는 제외했다. 기존 저작권 고지와 제3자 라이선스는 유지한다. 원본 파일의 고지와 의존성 이용 조건이 적용되며, 이 저장소의 문서가 새 라이선스를 부여하지 않는다.
+| NDVI interpretation | Policy | Mean return | Sample SD | Evaluation pairs |
+|---|---|---:|---:|---:|
+| literal | dqn | 0.101 | 67.181 | 15 |
+| literal | random | 0.920 | 2.235 | 15 |
+| literal | reward-greedy | 9.635 | 9.638 | 15 |
+| raw | dqn | 93.546 | 108.608 | 15 |
+| raw | random | 9.138 | 10.726 | 15 |
+| raw | reward-greedy | 13.367 | 13.193 | 15 |
+
+
+Return values are synthetic-environment diagnostics. They are **not** IoU, physical spread rates or evidence that DQN outperforms real wildfire models. Repeated rewards and staying can produce high returns without a useful spatial footprint, and the variability is substantial. The [results discussion](docs/experiment-results.md) explains this failure mode.
+
+### Checking the historical score
+
+Use the [data reconstruction procedure](data/README.md), resolve the [thesis audit findings](docs/thesis-reproduction-audit.md), then train on the declared input tensor. Freeze the checkpoint before opening the evaluation mask. `wildfire.verify_thesis` computes the actual overlap and difference from 0.726, retaining input/checkpoint hashes. It rejects synthetic or placeholder observed-mask provenance.
+
+At present, no valid independently sourced event mask is available in this checkout. The old `actual_fire_data.mat` was generated by a stochastic MATLAB simulation and is not accepted as observation. **No reproduced real-event IoU is reported.**
+
+## Roadmap
+
+- [x] Review the complete thesis and inspect key equations as page images.
+- [x] Implement testable reward, transitions, DQN training and a separate branching rollout.
+- [x] Run six seeded synthetic implementation experiments and publish actual logs/figures.
+- [x] Add explicit input reconstruction and observed-mask verification contracts.
+- [ ] Recover the original final code, checkpoint, mask and preprocessing configuration.
+- [ ] Resolve NDVI scale, diffusion rounding, time count and branching/reward semantics.
+- [ ] Reproduce the historical Uljin result, including a negative result if it does not match.
+- [ ] Evaluate a frozen model on an independently reserved event and publish uncertainty/baselines.
+
+## Contributing
+
+For a reproduction issue, attach dataset provenance, config, seed, runtime versions, checkpoint hash and expected versus observed output. Do not adjust held-out masks, event boundaries or labels to reach a requested score. A proposed change to the model or preprocessing must say whether it reproduces the thesis, corrects an ambiguity or defines a new experiment.
+
+## License
+
+Existing source notices apply. A repository-wide license for all historical research material has not been selected. Third-party observational datasets retain their own terms and attribution requirements. The private thesis PDF and source imagery are not redistributed in this repository.
+
+## Contact
+
+[hupositoc](https://github.com/hupositoc) · [Research/reproduction issues](https://github.com/hupositoc/wildfire-modeling-lab/issues)
+
+## Acknowledgments
+
+The section order follows [Best-README-Template](https://github.com/othneildrew/Best-README-Template), under the Unlicense. See [the 50-repository review](docs/reference-review-50.md), [design rationale](docs/design-rationale.md), and [primary data/model references](docs/thesis-reproduction-audit.md#primary-references-for-source-reconstruction). The graphics are original and do not imply endorsement by Toss, KRDS, data providers or a certification body.
+
+
+[Engineering decision record](docs/engineering-decisions.md) · [Review of 50 reference repositories](docs/reference-review-50.md)

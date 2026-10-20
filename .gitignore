@@ -18,3 +18,8 @@ node_modules/
 Intermediate/
 Saved/
 Binaries/
+
+# Local observational inputs; publish provenance deliberately.
+data/*.npz
+data/*.npy
+data/*.csv

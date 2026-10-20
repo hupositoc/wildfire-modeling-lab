@@ -1,9 +1,3 @@
-# 공개 준비 점검
+# Validation
 
-- 선별된 파일 수(이 문서 작성 전): 20
-- Python AST 문법 오류: 0건
-- 문자열 패턴 검토 대상: 3건
-- 컴파일·장비·에뮬레이터·모델 학습 검증: 미수행
-- 원본 소스는 변경하지 않았음
-
-이 결과는 실행 성공이나 공개 권한을 보증하지 않는다. 패턴 일치는 비밀정보 확정 판정이 아니며, 상세 목록은 로컬 공개 준비 보고서에만 보관한다.
+See [the validation record](docs/validation.md), [thesis audit](docs/thesis-reproduction-audit.md) and [actual experiment results](docs/experiment-results.md).

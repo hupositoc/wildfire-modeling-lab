@@ -1,0 +1,11 @@
+{
+  "kind":"observational",
+  "source_url":"REPLACE_WITH_ORIGINAL_PRODUCT_OR_SCENE_URL",
+  "event_id":"uljin-2022",
+  "mask_method":"REPLACE_WITH_CLASSIFIER_AND_COMPLETE_PARAMETERS",
+  "time_window":"REPLACE_WITH_UTC_START_AND_END",
+  "grid_bounds":[129.29,37.03,129.356,37.075],
+  "grid_origin":"lower-left",
+  "version":"REPLACE_WITH_IMMUTABLE_SOURCE_VERSION",
+  "is_example":true
+}
