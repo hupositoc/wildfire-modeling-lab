@@ -20,6 +20,9 @@ class Config:
     ndvi_mode:str='literal'
     rounding:str='floor'
     emc_max:float=20.
+    # Beyond the thesis: a cell already burned in this episode has no fuel left, so re-entering
+    # it (including the stay action) earns nothing. Off reproduces the printed reward.
+    consumed_fuel:bool=False
 
 def emc_percent(temp_c,rh):
     """Hailwood-Horrobin temperature-dependent form, T in Celsius, RH fraction.
@@ -47,11 +50,19 @@ def diffusion_steps(speed,cfg):
     raw=cfg.diffusion_scale*float(speed)*cfg.dt_seconds/cfg.cell_m
     return int(math.floor(raw) if cfg.rounding=='floor' else math.ceil(raw))
 
+def fuel_moisture(f,ix=Ellipsis):
+    """EMC in percent, plus the optional terrain offset when the dataset carries one."""
+    emc=emc_percent(f['temperature_c'][ix],f['rh_fraction'][ix])
+    if 'moisture_offset_pct' in f:emc=np.maximum(emc+f['moisture_offset_pct'][ix],0.)
+    return emc
+
 class Dataset:
     def __init__(self,fields,metadata):
         self.fields=fields;self.metadata=metadata
         required=('temperature_c','rh_fraction','wind_to_deg','wind_speed_ms','ndvi','upslope_deg')
-        if set(fields)!=set(required):raise ValueError('Expected exactly six named environmental fields.')
+        # Beyond the thesis: an optional terrain correction to fuel moisture (see data/add_terrain_moisture.py).
+        optional=('moisture_offset_pct',)
+        if not set(required)<=set(fields)<=set(required+optional):raise ValueError('Expected the six named environmental fields.')
         shape=next(iter(fields.values())).shape
         if len(shape)!=3 or any(v.shape!=shape for v in fields.values()):raise ValueError('Fields must share shape [time,y,x].')
         if shape[1]!=shape[2] or shape[0]<2:raise ValueError('Expected at least 2 time steps on a square grid.')
@@ -78,11 +89,29 @@ class Dataset:
         ndvi=float(f['ndvi'][t,y,x])
         # Thesis says non-vegetated cells do not spread and receive -1.
         if ndvi<=0:return -1.
-        moisture=1-float(emc_percent(f['temperature_c'][t,y,x],f['rh_fraction'][t,y,x]))/cfg.emc_max
+        moisture=1-float(fuel_moisture(f,(t,y,x)))/cfg.emc_max
         vegetation=ndvi/50.-1 if cfg.ndvi_mode=='literal' else ndvi
         slope=angular_alignment(action,f['upslope_deg'][t,y,x])
         wind=angular_alignment(action,f['wind_to_deg'][t,y,x])
         return float(np.dot(cfg.weights,[moisture,vegetation,slope,wind]))
+
+def observation_table(data):
+    f=data.fields;t,n,_=f['ndvi'].shape
+    yy,xx=np.meshgrid(np.arange(n),np.arange(n),indexing='ij')
+    grid=lambda a:np.broadcast_to(a/(n-1),(t,n,n))
+    return np.stack([grid(xx),grid(yy),f['temperature_c']/40.,f['rh_fraction'],f['wind_to_deg']/360.,
+                     f['wind_speed_ms']/15.,f['ndvi'],f['upslope_deg']/360.],-1).astype(np.float32)
+
+def reward_table(data,cfg):
+    """Reward for entering each [t,y,x] cell with each action; same values as Dataset.reward."""
+    f=data.fields;ndvi=f['ndvi'].astype(float)
+    moisture=1-fuel_moisture(f)/cfg.emc_max
+    vegetation=ndvi/50.-1 if cfg.ndvi_mode=='literal' else ndvi
+    norms=np.linalg.norm(ACTIONS,axis=1);unit=np.divide(ACTIONS,norms[:,None],out=np.zeros(ACTIONS.shape),where=norms[:,None]>0)
+    align=lambda deg:np.cos(np.deg2rad(deg))[...,None]*unit[:,0]+np.sin(np.deg2rad(deg))[...,None]*unit[:,1]
+    w=cfg.weights
+    table=w[0]*moisture[...,None]+w[1]*vegetation[...,None]+w[2]*align(f['upslope_deg'])+w[3]*align(f['wind_to_deg'])
+    return np.where(ndvi[...,None]<=0,-1.,table)
 
 class FirePathEnv:
     """One training path; full spread is a separate branching rollout.
@@ -90,8 +119,8 @@ class FirePathEnv:
     Boundary arrival terminates. Raw data use y-up coordinates. Wind means
     direction of travel, not meteorological wind-from. No target mask is read.
     """
-    def __init__(self,data,cfg,start=(6,10)):
-        self.data=data;self.cfg=cfg;self.start=np.array(start,dtype=int)
+    def __init__(self,data,cfg,start=(6,10),bonus=None):
+        self.data=data;self.cfg=cfg;self.start=np.array(start,dtype=int);self.bonus=bonus
         if data.fields['ndvi'].shape!=(cfg.horizon,cfg.size,cfg.size):raise ValueError('Config/data shape mismatch.')
         if not np.isclose(sum(cfg.weights),1) or any(w<0 for w in cfg.weights):raise ValueError('Weights must lie on the simplex.')
         if cfg.ndvi_mode not in ('literal','raw'):raise ValueError('Unknown NDVI interpretation.')
@@ -99,24 +128,33 @@ class FirePathEnv:
         if np.any(self.start<0) or np.any(self.start>=cfg.size):raise ValueError('Ignition outside AOI.')
     def reset(self):
         self.pos=self.start.copy();self.t=0;self.done=False
+        self.burned=np.zeros((self.cfg.size,self.cfg.size),bool);self.burned[self.start[1],self.start[0]]=True
         return self.data.observation(self.pos,0)
     def step(self,action):
         if not 0<=int(action)<len(ACTIONS):raise ValueError('Unknown action.')
         if self.done or self.t>=self.cfg.horizon:raise RuntimeError('Reset a completed episode.')
         x,y=self.pos;speed=self.data.fields['wind_speed_ms'][self.t,y,x]
-        moves=diffusion_steps(speed,self.cfg);reward=0.
+        moves=diffusion_steps(speed,self.cfg);reward=0.;path=[]
         # Every microstep is adjacent; no leap across non-fuel cells.
         for _ in range(moves):
             dest=self.pos+ACTIONS[int(action)]
             if np.any(dest<0) or np.any(dest>=self.cfg.size):break
-            reward+=self.data.reward(dest,action,self.t,self.cfg)
+            spent=self.cfg.consumed_fuel and self.burned[dest[1],dest[0]]
+            env=0. if spent else self.data.reward(dest,action,self.t,self.cfg);gained=env
+            # Thesis p.14: agreement with the actual burned map is an additional training reward.
+            if self.bonus is not None and not spent:gained+=float(self.bonus[dest[1],dest[0]])
+            self.burned[dest[1],dest[0]]=True
+            reward+=gained
+            # The path keeps the environmental reward only: the author's code used the JI term for
+            # training, never for judging the footprint, so the target cannot leak into the map.
+            path.append((int(dest[0]),int(dest[1]),env))
             if self.data.fields['ndvi'][self.t,dest[1],dest[0]]<=0:break
             self.pos=dest
             if np.any(self.pos==0) or np.any(self.pos==self.cfg.size-1):break
         self.t+=1
         done=self.t>=self.cfg.horizon or np.any(self.pos==0) or np.any(self.pos==self.cfg.size-1)
         self.done=bool(done)
-        return self.data.observation(self.pos,min(self.t,self.cfg.horizon-1)),reward,bool(done),{'position':self.pos.copy(),'microsteps_budget':moves}
+        return self.data.observation(self.pos,min(self.t,self.cfg.horizon-1)),reward,bool(done),{'position':self.pos.copy(),'microsteps_budget':moves,'path':path}
 
 def iou(pred,target):
     p=np.asarray(pred,dtype=bool);t=np.asarray(target,dtype=bool)

@@ -18,6 +18,7 @@ def main():
     parser.add_argument('--scenes',type=Path,required=True);parser.add_argument('--output',type=Path,required=True)
     parser.add_argument('--steps',type=int,choices=[99,100],required=True,help='Author must resolve the paper endpoint/count inconsistency.')
     parser.add_argument('--start',default='2022-03-04T02:00:00+00:00')
+    parser.add_argument('--weather-meta',type=Path,help='JSON from data/synth_weather.py; marks the tensor synthetic')
     args=parser.parse_args();n=50
     start=datetime.fromisoformat(args.start)
     if start.tzinfo is None:parser.error('Start timestamp requires a UTC offset.')
@@ -66,6 +67,9 @@ def main():
               'processing':['2021 annual mean scene NDVI, scene cloud fraction <=20%','cell-mean terrain aspect represented by circular components','hourly u/v/T/dewpoint linearly interpolated to 30-minute steps','RH derived with documented Magnus approximation','no observed burned-area mask generated','spatial sampling does not increase native weather resolution'],
               'source_url':'https://developers.google.com/earth-engine/datasets/catalog',
               'reproduction_status':'reconstructed inputs; original scene/classifier/hyperparameter choices unresolved'}
+    if args.weather_meta:
+        weather_meta=json.loads(args.weather_meta.read_text(encoding='utf-8'))
+        metadata.update(kind='synthetic',weather=weather_meta,collections=metadata['collections'][:2]+['ERA5 (Open-Meteo) + MicroMet downscaling'])
     args.output.with_suffix('.json').write_text(json.dumps(metadata,indent=2),encoding='utf-8')
     print(json.dumps({'shape':metadata['shape'],'observed_burn_mask_created':False,'original_thesis_export':False}))
 

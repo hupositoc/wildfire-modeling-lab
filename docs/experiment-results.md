@@ -8,7 +8,7 @@ This is an implementation benchmark with generated environments, not a reproduct
 - Training episodes: 960
 - Gradient updates: 28127
 - Recorded total training/evaluation wall time: 170.03 s on this CPU environment; not a benchmark against physical simulators.
-- Real-event IoU: unavailable; no observational target mask was supplied.
+- Real-event IoU: not part of this synthetic benchmark; see [Observed-event calibration](#observed-event-calibration-uljin-2022).
 
 The trial settings were not chosen against IoU 0.726. No early stopping, best evaluation seed or best mask threshold was selected to manufacture a match.
 
@@ -39,6 +39,41 @@ Each row summarizes 15 model-seed/environment pairs. These pairs are not 15 inde
 The printed NDVI interpretation has near-zero mean DQN return with very large variation; it does not consistently beat even the random baseline in this check. The raw-NDVI interpretation yields a much larger return, but the environment can reward remaining at or revisiting a favorable cell. More cumulative reward therefore cannot be presented as more accurate spread. This is an important negative result about the evaluation design, not a reason to replace the observations.
 
 The state also omits explicit time while the environment may be time-varying, as the thesis's feature description does. The current generated fields are largely time-stationary and do not establish adaptation to changing real weather. Training uses one path; a separate branching rollout contains unconfirmed fire-front assumptions. These are reasons to withhold a real-event prediction claim until the missing original details are resolved.
+
+## Observed-event calibration (Uljin 2022)
+
+### Target and protocol
+
+The target is `data/uljin_observed.npy`: a Sentinel-2 dNBR burn mask built independently by `data/build_burn_mask.py` (651 of 2,500 cells). The map digitized from thesis Fig. 4.5(a) agrees with it at IoU 0.29 only, so it is not used as the evaluation target. The ignition cell (6,10) sits about 2 km from the reported ignition village (Ducheon-ri) and where the fire entered the AOI.
+
+`wildfire/calibrate.py` runs the thesis search (simplex LHS, then Bayesian optimisation of the four reward weights and C_f) with these safeguards:
+
+- **JI reward for training only.** The thesis p.14 Jaccard term shapes training rewards, but the footprint is judged from environmental reward and the trained policy only. A variant that let the JI term into the footprint rule scored IoU 0.95–0.97 by copying the target; it was rejected as leakage and is now prevented by a unit test.
+- **Spatial hold-out (`--holdout checker`).** Alternate 10×10 blocks receive the JI reward and form the search objective. The other blocks are never seen by training or search and are reported separately.
+- **Unseen seeds.** The selected setting is re-trained with five seeds that were not used in the search.
+- **Fuel consumption (`--consumed-fuel`).** Re-entering a cell burned earlier in the episode, including the stay action, earns nothing. This removes a reward loop where an agent could earn reward without spreading.
+
+### Results
+
+Scores are IoU against the dNBR mask. "Held-out" means the held-out blocks scored by unseen seeds. The random policy uses the same reward and threshold.
+
+| Run | Weather input | JI reward | Held-out IoU (5 unseen seeds) | Random policy, held-out |
+|---|---|---|---:|---:|
+| run12 | ERA5 grid value | none | 0.255 | 0.258 |
+| run13 | ERA5 grid value | λ=1 | 0.317 | 0.258 |
+| run14 | ERA5 + MicroMet terrain downscaling | λ=1 | **0.348** | 0.258 |
+| run15 | run14 + terrain fuel-moisture offset | λ=1 | 0.296 | 0.258 |
+
+Averaging run14's setting over six unseen seeds × ten rollouts and cutting the map at a burn probability of 0.5 (the cut was fixed in advance) gives **held-out IoU 0.367**, against 0.336 for the mean of the individual seeds.
+
+As a reference ceiling, a supervised gradient-boosting classifier was trained directly on the static inputs (NDVI, slope, aspect, elevation, tree fraction) with the same checkerboard split. It reaches held-out IoU of about 0.37. On the current inputs, the DQN spread model performs at roughly that level.
+
+### Negative results kept on record
+
+- The visit-frequency footprint (thesis p.15), with the JI term excluded, scored about the same as the random policy (0.49 on the earlier target).
+- Longer training (1,000–3,000 episodes) lowered the score at the thesis weights, with or without fuel consumption.
+- Pre-fire NDVI (Sentinel-2, 2022-01-29 and 2022-02-18) was no more informative than the 2021 annual mean (AUC 0.65–0.70 vs 0.66).
+- The terrain fuel-moisture offset (`data/add_terrain_moisture.py`, K=2 percentage points from Rothermel 1983) lowered held-out IoU from 0.327 to 0.233 at fixed run14 weights, averaged over 8 seeds. K was not re-fitted to rescue it.
 
 ## Traceability and reproducibility
 

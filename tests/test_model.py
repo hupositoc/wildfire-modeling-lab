@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
-from wildfire.model import Config, Dataset, FirePathEnv, angular_alignment, diffusion_steps, emc_percent, iou, synthetic
-from wildfire.rollout import evaluate_observed,spread
+from wildfire.model import Config, Dataset, FirePathEnv, angular_alignment, diffusion_steps, emc_percent, iou, reward_table, synthetic
+from wildfire.rollout import evaluate_observed,fast_spread,q_table,spread
 
 class ModelTests(unittest.TestCase):
     def test_emc_increases_with_humidity(self):
@@ -23,6 +23,23 @@ class ModelTests(unittest.TestCase):
         data.fields['ndvi'][:,:,8]=-.5
         env=FirePathEnv(data,cfg,start=(6,10));env.reset();env.step(2)
         self.assertEqual(env.pos[0],7)
+    def test_ji_bonus_shapes_training_but_not_footprint(self):
+        cfg=Config();data=synthetic(1,cfg);bonus=np.full((cfg.size,cfg.size),5.)
+        plain=FirePathEnv(data,cfg);plain.reset();_,r0,_,i0=plain.step(2)
+        shaped=FirePathEnv(data,cfg,bonus=bonus);shaped.reset();_,r1,_,i1=shaped.step(2)
+        self.assertAlmostEqual(r1-r0,5.*len(i1['path']))
+        self.assertEqual(i0['path'],i1['path'])
+    def test_consumed_fuel_removes_stay_reward(self):
+        cfg=Config(consumed_fuel=True);env=FirePathEnv(synthetic(1,cfg),cfg);env.reset()
+        _,reward,_,info=env.step(8)
+        self.assertEqual(reward,0.);self.assertTrue(all(r==0. for _,_,r in info['path']))
+        cfg=Config();env=FirePathEnv(synthetic(1,cfg),cfg);env.reset()
+        self.assertNotEqual(env.step(8)[1],0.)
+    def test_moisture_offset_lowers_reward_and_matches_table(self):
+        cfg=Config(ndvi_mode='raw');data=synthetic(1,cfg)
+        wet=Dataset(dict(data.fields,moisture_offset_pct=np.full_like(data.fields['ndvi'],3.)),data.metadata)
+        self.assertLess(wet.reward((7,10),2,0,cfg),data.reward((7,10),2,0,cfg))
+        self.assertAlmostEqual(reward_table(wet,cfg)[0,10,7,2],wet.reward((7,10),2,0,cfg))
     def test_horizon_terminates(self):
         cfg=Config();env=FirePathEnv(synthetic(1,cfg),cfg);env.reset()
         for _ in range(cfg.horizon):_,_,done,_=env.step(8)
@@ -57,6 +74,41 @@ class ModelTests(unittest.TestCase):
         frames=spread(data,cfg,policy='random',start=(2,2),seed=4)
         self.assertEqual(frames.shape,(3,8,8))
         self.assertTrue(np.all(frames[:-1]<=frames[1:]))
+    def test_reward_table_matches_reward(self):
+        for mode in ('raw','literal'):
+            cfg=Config(ndvi_mode=mode);data=synthetic(3,cfg);table=reward_table(data,cfg)
+            for t,x,y,a in [(0,6,10,2),(5,25,25,4),(99,49,0,8),(40,30,12,7)]:
+                self.assertAlmostEqual(table[t,y,x,a],data.reward((x,y),a,t,cfg),places=5)
+    def test_fast_spread_matches_spread(self):
+        import torch
+        from wildfire.experiment import QNetwork
+        torch.manual_seed(0);net=QNetwork();cfg=Config(size=20,horizon=12);data=synthetic(4,cfg)
+        slow=spread(data,cfg,net,'dqn',(5,5))
+        fast=fast_spread(data,cfg,q_table(data,net),reward_table(data,cfg),(5,5),policy='dqn')
+        np.testing.assert_array_equal(slow,fast)
+        soft=fast_spread(data,cfg,q_table(data,net),reward_table(data,cfg),(5,5),seed=1,temperature=2.)
+        self.assertTrue(np.all(soft[:-1]<=soft[1:]))
+    def test_beyond_thesis_spread_options(self):
+        import torch
+        from wildfire.experiment import QNetwork
+        torch.manual_seed(0);net=QNetwork();cfg=Config(size=20,horizon=12);data=synthetic(4,cfg)
+        q,r=q_table(data,net),reward_table(data,cfg)
+        base=fast_spread(data,cfg,q,r,(5,5),seed=1,temperature=4.)[-1]
+        strict=fast_spread(data,cfg,q,r,(5,5),seed=1,temperature=4.,theta=float(r.max())+1)[-1]
+        self.assertEqual(strict.sum(),1)
+        wall=np.zeros((20,20),bool);wall[:,8]=True
+        blocked=fast_spread(data,cfg,q,r,(5,5),seed=1,temperature=4.,barrier=wall)[-1]
+        self.assertFalse(blocked[:,8:].any())
+        hard=fast_spread(data,cfg,q,r,(5,5),seed=1,temperature=4.,sharpness=1e6)[-1]
+        self.assertGreater(hard.sum(),1);self.assertLessEqual(base.sum(),400)
+    def test_micromet_downscaling(self):
+        from data.synth_weather import downscale
+        z=np.add.outer(np.zeros(50),np.linspace(0,500,50))
+        temp,dew,u,v=downscale(z,250.,10.,-5.,5.,270.,1.,5)
+        self.assertGreater(temp[:,0].mean(),temp[:,-1].mean());self.assertTrue(np.all(dew<=temp))
+        self.assertAlmostEqual(float(np.hypot(u,v).mean()),5.,places=6)
+        flat=downscale(z,250.,10.,-5.,5.,270.,0.,5)
+        np.testing.assert_allclose(np.hypot(flat[2],flat[3]),5.)
     def test_weight_simplex_validation(self):
         cfg=Config(weights=(1,1,1,1))
         with self.assertRaises(ValueError):FirePathEnv(synthetic(1,cfg),cfg)
