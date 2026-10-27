@@ -44,7 +44,9 @@ The state also omits explicit time while the environment may be time-varying, as
 
 ### Target and protocol
 
-The target is `data/uljin_observed.npy`: a Sentinel-2 dNBR burn mask built independently by `data/build_burn_mask.py` (651 of 2,500 cells). The map digitized from thesis Fig. 4.5(a) agrees with it at IoU 0.29 only, so it is not used as the evaluation target. The ignition cell (6,10) sits about 2 km from the reported ignition village (Ducheon-ri) and where the fire entered the AOI.
+The target is `data/uljin_observed.npy`: a Sentinel-2 dNBR burn mask built independently by `data/build_burn_mask.py`. The map digitized from thesis Fig. 4.5(a) is not used as the evaluation target. The ignition cell (6,10) sits about 2 km from the reported ignition village (Ducheon-ri) and where the fire entered the AOI.
+
+**Mask v2 (current, 1,034 of 2,500 cells).** The first mask (v1, 651 cells) used the 2022-03-15 image, ten days after ignition. Scorched pine had not yet browned, so crown-scorched stands kept a near-normal NBR and were missed. The same rule (pre-fire 2022-02-18, ISODATA threshold, dNBR ≥ 0.1 floor after Key & Benson 2006) on the 2022-04-04 image gives 1,034 cells and contains 647 of the 651 v1 cells. Every cloud-free scene from 2022-04-09 to 2022-05-04 gives 820–1,105 cells, so the April extent is stable while March is the outlier. Assessing after browning follows MTBS extended-assessment practice. The v1 mask is kept as `data/uljin_observed_20220315.npy`.
 
 `wildfire/calibrate.py` runs the thesis search (simplex LHS, then Bayesian optimisation of the four reward weights and C_f) with these safeguards:
 
@@ -53,9 +55,30 @@ The target is `data/uljin_observed.npy`: a Sentinel-2 dNBR burn mask built indep
 - **Unseen seeds.** The selected setting is re-trained with five seeds that were not used in the search.
 - **Fuel consumption (`--consumed-fuel`).** Re-entering a cell burned earlier in the episode, including the stay action, earns nothing. This removes a reward loop where an agent could earn reward without spreading.
 
-### Results
+Two optional additions go beyond the thesis:
 
-Scores are IoU against the dNBR mask. "Held-out" means the held-out blocks scored by unseen seeds. The random policy uses the same reward and threshold.
+- **Burnout time (`--residences`).** A cell stops spreading fire a fixed number of 30-minute steps after it ignites. Without it, every burned cell stays active until the end of the episode.
+- **Forest type (`--fuel-type`).** `data/add_forest_type.py` takes the conifer share per cell from the KFS 1:5,000 forest type map (2019 edition, before the fire). A fifth reward weight scores it. In the AOI the conifer share is 0.64, nearly all *Pinus densiflora*.
+
+### Results on mask v2
+
+Scores are IoU against mask v2. "Held-out" means the held-out blocks scored by the five unseen seeds. The random policy uses the same reward, knobs and threshold. Because the burned area is larger, the random baseline rises to about 0.41; the DQN gain over it is the number that matters.
+
+| Run | Inputs and knobs | Held-out IoU (5 unseen seeds) | Random policy, held-out | Predicted cells |
+|---|---|---:|---:|---:|
+| run20 | run14 setting (MicroMet weather) | 0.384 | 0.405 | 1,533 |
+| run21 | run20 + burnout time (residence), C_f ≥ 0.067 | **0.455** | 0.411 | 1,150 |
+| run22 | run21 + KFS forest type (5th reward term, conifer share) | 0.419 | 0.411 | 1,277 |
+
+run21 selected a burnout time of 8 steps (4 h), C_f 0.497, temperature 8 and θ 0.6. On the fit blocks its unseen seeds score 0.47–0.55 (mean 0.519) against 0.416 for the random policy with the same knobs. C_f, temperature and θ all sit at the top of their search ranges, so the optimum may lie outside them. The ranges were not widened afterwards, to avoid tuning for IoU alone.
+
+Averaging run21's setting over six unseen seeds × ten rollouts and cutting at a burn probability of 0.5 (fixed in advance) gives **held-out IoU 0.476** (1,121 cells), against 0.466 for the mean of the individual seeds. Cuts of 0.3 and 0.7 give 0.468 and 0.459.
+
+The forest-type term did not improve the policy, although the map is informative: in the supervised reference below it raises AUC from 0.74 to 0.77.
+
+**Supervised reference.** A gradient-boosting classifier trained directly on the static inputs (NDVI, slope, aspect, elevation, tree fraction) with the same checkerboard split reaches held-out IoU of about 0.50 at its best threshold, or 0.51 with the forest-type fractions added. These are optimistic upper references since the threshold is chosen on the held-out blocks.
+
+### Results on mask v1 (2022-03-15, superseded)
 
 | Run | Weather input | JI reward | Held-out IoU (5 unseen seeds) | Random policy, held-out |
 |---|---|---|---:|---:|
@@ -65,10 +88,9 @@ Scores are IoU against the dNBR mask. "Held-out" means the held-out blocks score
 | run15 | run14 + terrain fuel-moisture offset | λ=1 | 0.296 | 0.258 |
 | run16 | run14, C_f ≥ 0.067 (VIIRS bound) | λ=1 | 0.307 | 0.258 |
 | run17 | run16, ignition threshold grid widened to 0.9 | λ=1 | 0.273 | 0.258 |
+| run18 | run16 + burnout time | λ=1 | 0.338 | 0.258 |
 
-Averaging run14's setting over six unseen seeds × ten rollouts and cutting the map at a burn probability of 0.5 (the cut was fixed in advance) gives **held-out IoU 0.367**, against 0.336 for the mean of the individual seeds.
-
-As a reference ceiling, a supervised gradient-boosting classifier was trained directly on the static inputs (NDVI, slope, aspect, elevation, tree fraction) with the same checkerboard split. It reaches held-out IoU of about 0.37. On the current inputs, the DQN spread model performs at roughly that level.
+Averaging run14's setting over six unseen seeds × ten rollouts and cutting the map at a burn probability of 0.5 (the cut was fixed in advance) gave held-out IoU 0.367. The supervised reference on v1 was about 0.38, or 0.42 with forest type. Part of the overprediction seen on v1 (e.g. run16: 1,801 cells vs 651) came from the mask being too small.
 
 ### Negative results kept on record
 

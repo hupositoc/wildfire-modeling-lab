@@ -1,0 +1,35 @@
+{
+  "kind": "observational",
+  "event_id": "uljin-2022",
+  "version": "reconstruction-v1",
+  "source_url": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a",
+  "mask_method": "ISODATA on standardized [post NBR, post NDVI, dNBR] at ~10 m; clusters with mean dNBR>=0.1 are burned; cell burned if >=50% of valid pixels burned; water/cloud excluded via SCL",
+  "time_window": "2022-02-18 (pre) / 2022-03-15 (post)",
+  "pre_aoi_cloud": 0.0,
+  "post_aoi_cloud": 0.0,
+  "pre_items": [
+    "S2B_52SEF_20220218_0_L2A",
+    "S2B_52SEG_20220218_0_L2A"
+  ],
+  "post_items": [
+    "S2A_52SEF_20220315_0_L2A",
+    "S2A_52SEG_20220315_0_L2A"
+  ],
+  "grid_bounds": [
+    129.29,
+    37.03,
+    129.356,
+    37.075
+  ],
+  "grid_origin": "lower-left",
+  "shape": [
+    50,
+    50
+  ],
+  "burned_cells": 651,
+  "clusters": 7,
+  "burned_clusters": 3,
+  "thesis_difference": "thesis used VIIRS reference [25] and GEE ISODATA with unreported settings; this is an independent reconstruction",
+  "mask_sha256": "09eb0c2bb7b40ebdac264d07f7330ee868d7e73d3e573ef89d8801a67511bfbf",
+  "built_utc": "2026-10-20T07:37:52.579196+00:00"
+}
