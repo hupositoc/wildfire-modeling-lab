@@ -8,7 +8,8 @@ training (thesis p.14). Every score here is fitted to the same event, as the the
 
 Beyond the thesis (each off by default): --thetas sets the ignition reward threshold (A),
 --barrier/--tree-mins block cells whose WorldCover tree fraction is below a cut (B), and
---sharpness makes ignition probabilistic around theta (E). All are grid-searched after training.
+--sharpness makes ignition probabilistic around theta (E), --residences burns a cell out after that many
+steps (F). All are grid-searched after training.
 """
 import csv
 import argparse
@@ -78,8 +79,8 @@ def visit_scores(frequency,reward_sum,target,region):
     return {float(t):region_iou(footprint(frequency,reward_sum,t),target,region) for t in TAUS}
 
 def knobs(spread):
-    return [dict(temperature=t,theta_q=h,tree_min=m,sharpness=k) for t in spread['temperatures'] for h in spread['thetas']
-            for m in spread['tree_mins'] for k in spread['sharpness']]
+    return [dict(temperature=t,theta_q=h,tree_min=m,sharpness=k,**({'residence':d} if d is not None else {})) for t in spread['temperatures'] for h in spread['thetas']
+            for m in spread['tree_mins'] for k in spread['sharpness'] for d in spread.get('residences',[None])]
 
 def reward_stats(rewards,spread):
     fuel=rewards[rewards>-1]
@@ -91,7 +92,7 @@ def run_spread(data,cfg,q,rewards,seed,knob,tree=None,stats=None):
     stats=stats or reward_stats(rewards,{'thetas':[knob['theta_q']]})
     theta=stats['theta'][knob['theta_q']];sharpness=None if knob['sharpness'] is None else knob['sharpness']/stats['std']
     barrier=None if knob['tree_min'] is None else tree<knob['tree_min']
-    return fast_spread(data,cfg,q,rewards,START,seed,knob['temperature'],theta=theta,barrier=barrier,sharpness=sharpness)[-1]
+    return fast_spread(data,cfg,q,rewards,START,seed,knob['temperature'],theta=theta,barrier=barrier,sharpness=sharpness,residence=knob.get('residence'))[-1]
 
 def policy_scores(data,cfg,network,target,spread,regions,tree=None,rollouts=3):
     q=q_table(data,network);rewards=reward_table(data,cfg);stats=reward_stats(rewards,spread);out=[{} for _ in regions]
@@ -124,26 +125,28 @@ def init_worker(dataset,mask,ndvi_mode,episodes,footprint_mode,ji_reward,spread,
 
 def score_point(job):
     x,seed=job;s=STATE
-    cfg=replace(s['cfg'],weights=tuple(float(v) for v in x[:4]),diffusion_scale=float(x[4]))
+    cfg=replace(s['cfg'],weights=tuple(float(v) for v in x[:-1]),diffusion_scale=float(x[-1]))
     frequency,reward_sum,network=train_visits(s['data'],cfg,s['episodes'],seed,START,s['bonus'])
     regions=[s['fit']]+([s['held']] if s['held'] is not None else [])
     if s['footprint']=='visits':scores=[visit_scores(frequency,reward_sum,s['target'],r) for r in regions]
     else:scores=policy_scores(s['data'],cfg,network,s['target'],s['spread'],regions,s['tree'])
     return scores+[None]*(2-len(scores))
 
+K=4  # reward weights searched; 5 with --fuel-type
+
 def from_unit(u):return np.exp(np.log(CF_RANGE[0])+u*(np.log(CF_RANGE[1])-np.log(CF_RANGE[0])))
 
 def simplex_lhs(n,rng):
     strata=lambda:(rng.permutation(n)+rng.random(n))/n
-    cube=np.stack([strata() for _ in range(4)],1)
-    weights=np.diff(np.hstack([np.zeros((n,1)),np.sort(cube[:,:3],1),np.ones((n,1))]),axis=1)
-    return np.hstack([weights,from_unit(cube[:,3])[:,None]])
+    cube=np.stack([strata() for _ in range(K)],1)
+    weights=np.diff(np.hstack([np.zeros((n,1)),np.sort(cube[:,:K-1],1),np.ones((n,1))]),axis=1)
+    return np.hstack([weights,from_unit(cube[:,K-1])[:,None]])
 
 def random_candidates(n,rng):
-    return np.hstack([rng.dirichlet(np.ones(4),n),from_unit(rng.random(n))[:,None]])
+    return np.hstack([rng.dirichlet(np.ones(K),n),from_unit(rng.random(n))[:,None]])
 
 def scaled(x):
-    x=np.atleast_2d(x).copy();x[:,4]=(np.log(x[:,4])-np.log(CF_RANGE[0]))/(np.log(CF_RANGE[1])-np.log(CF_RANGE[0]));return x
+    x=np.atleast_2d(x).copy();x[:,K]=(np.log(x[:,K])-np.log(CF_RANGE[0]))/(np.log(CF_RANGE[1])-np.log(CF_RANGE[0]));return x
 
 def expected_improvement(gp,x,best):
     mu,sd=gp.predict(scaled(x),return_std=True);sd=np.maximum(sd,1e-9)
@@ -158,7 +161,7 @@ def batch(gp,rng,best,size):
     return chosen
 
 def main():
-    global CF_RANGE
+    global CF_RANGE,K
     parser=argparse.ArgumentParser()
     parser.add_argument('--dataset',type=Path,required=True);parser.add_argument('--mask',type=Path,required=True)
     parser.add_argument('--output',type=Path,required=True)
@@ -173,14 +176,16 @@ def main():
     parser.add_argument('--thetas',type=float,nargs='+',default=[0.],help='(A) ignition threshold as a quantile of fuel-cell rewards; 0 keeps the thesis rule r>=0')
     parser.add_argument('--barrier',type=Path,help='(B) extras.csv with WorldCover tree_fraction')
     parser.add_argument('--tree-mins',type=float,nargs='+',default=[],help='(B) cells below this tree fraction cannot burn')
+    parser.add_argument('--residences',type=int,nargs='+',default=[],help='(F) burnout time in steps; omitted keeps cells active forever')
     parser.add_argument('--sharpness',type=float,nargs='+',default=[],help='(E) P(ignite)=sigmoid(k*(r-theta)/std(r)); omitted means hard threshold')
     parser.add_argument('--holdout',choices=['none','checker'],default='none',help='checker: JI reward and search objective use alternate 10x10 blocks; the rest is reported as held-out')
     parser.add_argument('--consumed-fuel',action='store_true',help='re-entering a cell burned earlier in the episode earns nothing (beyond the thesis)')
+    parser.add_argument('--fuel-type',action='store_true',help='search a fifth weight on the conifer_fraction field (data/add_forest_type.py)')
     parser.add_argument('--cf-range',type=float,nargs=2,default=list(CF_RANGE),help='C_f search bounds; e.g. a lower bound from observed arrival times (tools/viirs_arrival.py)')
     args=parser.parse_args();rng=np.random.default_rng(args.search_seed);history=[];started=time.perf_counter()
-    CF_RANGE=tuple(args.cf_range)
+    CF_RANGE=tuple(args.cf_range);K=5 if args.fuel_type else 4
     if args.tree_mins and not args.barrier:parser.error('--tree-mins needs --barrier')
-    spread={'temperatures':args.temperatures,'thetas':args.thetas,'tree_mins':[None]+args.tree_mins,'sharpness':[None]+args.sharpness}
+    spread={'temperatures':args.temperatures,'thetas':args.thetas,'tree_mins':[None]+args.tree_mins,'sharpness':[None]+args.sharpness,'residences':args.residences or [None]}
     setup=(args.dataset,args.mask,args.ndvi_mode,args.episodes,args.footprint,args.ji_reward,spread,args.barrier,args.holdout,args.consumed_fuel)
     init_worker(*setup)
     pool=ProcessPoolExecutor(args.workers,initializer=init_worker,initargs=setup)
@@ -190,7 +195,7 @@ def main():
         for i,x in enumerate(points):
             per=results[i*len(seeds):(i+1)*len(seeds)]
             mean={k:float(np.mean([p[0][k] for p in per])) for k in per[0][0]};knob=max(mean,key=mean.get) if fixed is None else fixed
-            row={'phase':phase,'seeds':seeds,'weights':[float(v) for v in x[:4]],'diffusion_scale':float(x[4]),
+            row={'phase':phase,'seeds':seeds,'weights':[float(v) for v in x[:K]],'diffusion_scale':float(x[K]),
                  'knob':json.loads(knob) if args.footprint=='policy' else knob,
                  'jaccard':mean[knob],'per_seed':[p[0][knob] for p in per]}
             # Reported only; never used to pick the knob or the next search point.
@@ -200,7 +205,7 @@ def main():
     history+=evaluate(list(simplex_lhs(args.lhs,rng)),'simplex-lhs',args.seeds)
     for r in range(args.rounds):
         X=np.array([h['weights']+[h['diffusion_scale']] for h in history]);y=np.array([h['jaccard'] for h in history])
-        gp=GaussianProcessRegressor(Matern(length_scale=np.ones(5),nu=2.5)+WhiteKernel(1e-3),normalize_y=True,n_restarts_optimizer=3,random_state=0).fit(scaled(X),y)
+        gp=GaussianProcessRegressor(Matern(length_scale=np.ones(K+1),nu=2.5)+WhiteKernel(1e-3),normalize_y=True,n_restarts_optimizer=3,random_state=0).fit(scaled(X),y)
         history+=evaluate(batch(gp,rng,y.max(),args.batch),'bayesian-%d'%(r+1),args.seeds)
         print(json.dumps({'round':r+1,'best_so_far':round(float(max(h['jaccard'] for h in history)),4),'elapsed_min':round((time.perf_counter()-started)/60,1)}),flush=True)
     best=max(history,key=lambda h:h['jaccard'])

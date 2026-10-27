@@ -50,19 +50,23 @@ def q_table(data,network):
     obs=observation_table(data)
     with torch.no_grad():return network(torch.from_numpy(obs.reshape(-1,8))).numpy().reshape(obs.shape[:3]+(9,))
 
-def fast_spread(data,cfg,q,rewards,start=(6,10),seed=0,temperature=1.,policy='softmax',theta=0.,barrier=None,sharpness=None):
+def fast_spread(data,cfg,q,rewards,start=(6,10),seed=0,temperature=1.,policy='softmax',theta=0.,barrier=None,sharpness=None,residence=None):
     """Vectorised spread with the same rules as spread(); fully enclosed sources are skipped.
 
     Beyond the thesis: theta raises the ignition reward threshold (A), barrier marks cells that
     cannot burn (B), and sharpness turns the threshold into P(ignite)=sigmoid(sharpness*(r-theta)) (E).
+    residence is a burnout time in steps: a cell can ignite neighbours only for that many steps after
+    it caught fire, so a front that meets poor conditions dies out instead of waiting indefinitely.
     """
     rng=np.random.default_rng(seed);n=cfg.size
     burned=np.zeros((n,n),bool);burned[start[1],start[0]]=True
     active=np.zeros((n,n),bool);active[start[1],start[0]]=True
+    ignited=np.full((n,n),-1);ignited[start[1],start[0]]=0
     fuel=data.fields['ndvi']>0;frames=[]
     if barrier is not None:fuel=fuel&~barrier
     for t in range(cfg.horizon):
         speed=float(data.fields['wind_speed_ms'][t].mean())
+        if residence is not None:active&=ignited>t-residence
         for _ in range(diffusion_steps(speed,cfg)):
             open_=np.pad(~burned,1)
             free=np.zeros((n,n),bool)
@@ -79,6 +83,7 @@ def fast_spread(data,cfg,q,rewards,start=(6,10),seed=0,temperature=1.,policy='so
             r=rewards[t,ny,nx,choices]
             if sharpness is None:ok=fuel[t,ny,nx]&(r>=theta)
             else:ok=fuel[t,ny,nx]&(rng.random(len(xs))<.5+.5*np.tanh(.5*sharpness*(r-theta)))
+            fresh=~burned[ny,nx]&ok;ignited[ny[fresh],nx[fresh]]=t
             burned[ny[ok],nx[ok]]=True;active[ny[ok],nx[ok]]=True
         frames.append(burned.copy())
     return np.stack(frames)

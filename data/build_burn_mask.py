@@ -51,7 +51,9 @@ def indices(items):
 
 def main():
     parser=argparse.ArgumentParser()
-    parser.add_argument('--pre',default='2022-01-15/2022-03-03');parser.add_argument('--post',default='2022-03-14/2022-04-30')
+    parser.add_argument('--pre',default='2022-01-15/2022-03-03');# Post window starts in April: on 2022-03-15 scorched pine crowns had not yet browned, so dNBR missed
+    # much of the burn (651 vs 1,034 cells). The first clear April scene precedes broadleaf leaf-out.
+    parser.add_argument('--post',default='2022-04-01/2022-04-30')
     parser.add_argument('--out',type=Path,default=Path('data/uljin_observed.npy'))
     args=parser.parse_args()
     pre_days=by_date(search_s2(*args.pre.split('/')));post_days=by_date(search_s2(*args.post.split('/')))
@@ -69,7 +71,7 @@ def main():
     mask=np.nan_to_num(fraction)>=.5
     args.out.parent.mkdir(parents=True,exist_ok=True)
     np.save(str(args.out),mask)
-    meta={'kind':'observational','event_id':'uljin-2022','version':'reconstruction-v1',
+    meta={'kind':'observational','event_id':'uljin-2022','version':'reconstruction-v2',
           'source_url':'https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a',
           'mask_method':'ISODATA on standardized [post NBR, post NDVI, dNBR] at ~10 m; clusters with mean dNBR>=0.1 are burned; cell burned if >=50% of valid pixels burned; water/cloud excluded via SCL',
           'time_window':pre_day+' (pre) / '+post_day+' (post)','pre_aoi_cloud':pre_cloud,'post_aoi_cloud':post_cloud,

@@ -15,7 +15,8 @@ class Config:
     cell_m:float=100.
     diffusion_scale:float=.1
     gamma:float=1.
-    # Order follows Table 4.2: moisture, vegetation, slope, wind.
+    # Order follows Table 4.2: moisture, vegetation, slope, wind. A fifth weight (beyond the thesis)
+    # scores the conifer share from the forest type map and needs the conifer_fraction field.
     weights:tuple=(.264,.113,.140,.483)
     ndvi_mode:str='literal'
     rounding:str='floor'
@@ -61,7 +62,7 @@ class Dataset:
         self.fields=fields;self.metadata=metadata
         required=('temperature_c','rh_fraction','wind_to_deg','wind_speed_ms','ndvi','upslope_deg')
         # Beyond the thesis: an optional terrain correction to fuel moisture (see data/add_terrain_moisture.py).
-        optional=('moisture_offset_pct',)
+        optional=('moisture_offset_pct','conifer_fraction')
         if not set(required)<=set(fields)<=set(required+optional):raise ValueError('Expected the six named environmental fields.')
         shape=next(iter(fields.values())).shape
         if len(shape)!=3 or any(v.shape!=shape for v in fields.values()):raise ValueError('Fields must share shape [time,y,x].')
@@ -93,7 +94,9 @@ class Dataset:
         vegetation=ndvi/50.-1 if cfg.ndvi_mode=='literal' else ndvi
         slope=angular_alignment(action,f['upslope_deg'][t,y,x])
         wind=angular_alignment(action,f['wind_to_deg'][t,y,x])
-        return float(np.dot(cfg.weights,[moisture,vegetation,slope,wind]))
+        terms=[moisture,vegetation,slope,wind]
+        if len(cfg.weights)==5:terms.append(float(f['conifer_fraction'][t,y,x]))
+        return float(np.dot(cfg.weights,terms))
 
 def observation_table(data):
     f=data.fields;t,n,_=f['ndvi'].shape
@@ -111,6 +114,7 @@ def reward_table(data,cfg):
     align=lambda deg:np.cos(np.deg2rad(deg))[...,None]*unit[:,0]+np.sin(np.deg2rad(deg))[...,None]*unit[:,1]
     w=cfg.weights
     table=w[0]*moisture[...,None]+w[1]*vegetation[...,None]+w[2]*align(f['upslope_deg'])+w[3]*align(f['wind_to_deg'])
+    if len(w)==5:table=table+w[4]*f['conifer_fraction'][...,None]
     return np.where(ndvi[...,None]<=0,-1.,table)
 
 class FirePathEnv:
@@ -123,6 +127,8 @@ class FirePathEnv:
         self.data=data;self.cfg=cfg;self.start=np.array(start,dtype=int);self.bonus=bonus
         if data.fields['ndvi'].shape!=(cfg.horizon,cfg.size,cfg.size):raise ValueError('Config/data shape mismatch.')
         if not np.isclose(sum(cfg.weights),1) or any(w<0 for w in cfg.weights):raise ValueError('Weights must lie on the simplex.')
+        if len(cfg.weights)==5 and 'conifer_fraction' not in data.fields:raise ValueError('A fifth weight needs the conifer_fraction field.')
+        if len(cfg.weights) not in (4,5):raise ValueError('Expected four or five weights.')
         if cfg.ndvi_mode not in ('literal','raw'):raise ValueError('Unknown NDVI interpretation.')
         if cfg.rounding not in ('floor','ceil'):raise ValueError('Unknown rounding interpretation.')
         if np.any(self.start<0) or np.any(self.start>=cfg.size):raise ValueError('Ignition outside AOI.')

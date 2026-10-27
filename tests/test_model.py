@@ -101,6 +101,23 @@ class ModelTests(unittest.TestCase):
         self.assertFalse(blocked[:,8:].any())
         hard=fast_spread(data,cfg,q,r,(5,5),seed=1,temperature=4.,sharpness=1e6)[-1]
         self.assertGreater(hard.sum(),1);self.assertLessEqual(base.sum(),400)
+    def test_residence_time_stops_spread(self):
+        import torch
+        from wildfire.experiment import QNetwork
+        torch.manual_seed(0);net=QNetwork();cfg=Config(size=20,horizon=12);data=synthetic(4,cfg)
+        q,r=q_table(data,net),reward_table(data,cfg)
+        free=fast_spread(data,cfg,q,r,(5,5),seed=1,temperature=4.)
+        short=fast_spread(data,cfg,q,r,(5,5),seed=1,temperature=4.,residence=1)
+        np.testing.assert_array_equal(free[0],short[0])
+        self.assertLess(short[-1].sum(),free[-1].sum())
+        np.testing.assert_array_equal(short[-2],short[-1])
+    def test_fifth_weight_scores_conifer_share(self):
+        cfg=Config(ndvi_mode='raw');data=synthetic(1,cfg)
+        pine=Dataset(dict(data.fields,conifer_fraction=np.ones_like(data.fields['ndvi'])),data.metadata)
+        five=Config(ndvi_mode='raw',weights=(.2,.1,.1,.4,.2))
+        self.assertAlmostEqual(pine.reward((7,10),2,0,five)-pine.reward((7,10),2,0,Config(ndvi_mode='raw',weights=(.2,.1,.1,.4,0))),.2)
+        self.assertAlmostEqual(reward_table(pine,five)[0,10,7,2],pine.reward((7,10),2,0,five),places=5)
+        with self.assertRaises(ValueError):FirePathEnv(data,five)
     def test_micromet_downscaling(self):
         from data.synth_weather import downscale
         z=np.add.outer(np.zeros(50),np.linspace(0,500,50))
