@@ -158,6 +158,7 @@ def batch(gp,rng,best,size):
     return chosen
 
 def main():
+    global CF_RANGE
     parser=argparse.ArgumentParser()
     parser.add_argument('--dataset',type=Path,required=True);parser.add_argument('--mask',type=Path,required=True)
     parser.add_argument('--output',type=Path,required=True)
@@ -175,7 +176,9 @@ def main():
     parser.add_argument('--sharpness',type=float,nargs='+',default=[],help='(E) P(ignite)=sigmoid(k*(r-theta)/std(r)); omitted means hard threshold')
     parser.add_argument('--holdout',choices=['none','checker'],default='none',help='checker: JI reward and search objective use alternate 10x10 blocks; the rest is reported as held-out')
     parser.add_argument('--consumed-fuel',action='store_true',help='re-entering a cell burned earlier in the episode earns nothing (beyond the thesis)')
+    parser.add_argument('--cf-range',type=float,nargs=2,default=list(CF_RANGE),help='C_f search bounds; e.g. a lower bound from observed arrival times (tools/viirs_arrival.py)')
     args=parser.parse_args();rng=np.random.default_rng(args.search_seed);history=[];started=time.perf_counter()
+    CF_RANGE=tuple(args.cf_range)
     if args.tree_mins and not args.barrier:parser.error('--tree-mins needs --barrier')
     spread={'temperatures':args.temperatures,'thetas':args.thetas,'tree_mins':[None]+args.tree_mins,'sharpness':[None]+args.sharpness}
     setup=(args.dataset,args.mask,args.ndvi_mode,args.episodes,args.footprint,args.ji_reward,spread,args.barrier,args.holdout,args.consumed_fuel)

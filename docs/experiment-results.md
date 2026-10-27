@@ -63,6 +63,8 @@ Scores are IoU against the dNBR mask. "Held-out" means the held-out blocks score
 | run13 | ERA5 grid value | λ=1 | 0.317 | 0.258 |
 | run14 | ERA5 + MicroMet terrain downscaling | λ=1 | **0.348** | 0.258 |
 | run15 | run14 + terrain fuel-moisture offset | λ=1 | 0.296 | 0.258 |
+| run16 | run14, C_f ≥ 0.067 (VIIRS bound) | λ=1 | 0.307 | 0.258 |
+| run17 | run16, ignition threshold grid widened to 0.9 | λ=1 | 0.273 | 0.258 |
 
 Averaging run14's setting over six unseen seeds × ten rollouts and cutting the map at a burn probability of 0.5 (the cut was fixed in advance) gives **held-out IoU 0.367**, against 0.336 for the mean of the individual seeds.
 
@@ -74,6 +76,7 @@ As a reference ceiling, a supervised gradient-boosting classifier was trained di
 - Longer training (1,000–3,000 episodes) lowered the score at the thesis weights, with or without fuel consumption.
 - Pre-fire NDVI (Sentinel-2, 2022-01-29 and 2022-02-18) was no more informative than the 2021 annual mean (AUC 0.65–0.70 vs 0.66).
 - The terrain fuel-moisture offset (`data/add_terrain_moisture.py`, K=2 percentage points from Rothermel 1983) lowered held-out IoU from 0.327 to 0.233 at fixed run14 weights, averaged over 8 seeds. K was not re-fitted to rescue it.
+- **Physical spread speed.** VIIRS S-NPP first detections (`tools/viirs_arrival.py`, keyless FIRMS archive) show most of the AOI burning on the first pass after ignition (step 4.3). Reaching those cells in time needs C_f ≥ 0.067 (median distance) to 0.097 (90th percentile), while the unconstrained searches settled near 0.016. Constraining C_f to [0.067, 0.5] made the unseen seeds more consistent (run16: 0.34–0.37 on the fit blocks), but the footprint overpredicted (1,801 cells vs 651) and held-out IoU fell to 0.307. Widening the threshold grid (run17) did not help. C_f and the rollout temperature then sat at the top of their ranges, i.e. the search preferred near-random fast spread, and held-out IoU was 0.273. With the current reward terms, the model cannot match both the observed speed and the observed extent.
 
 ## Traceability and reproducibility
 
