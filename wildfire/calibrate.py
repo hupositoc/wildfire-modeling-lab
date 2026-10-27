@@ -218,7 +218,9 @@ def main():
     if args.footprint=='visits':predicted=footprint(frequency,reward_sum,best['knob'])
     rewards=reward_table(s['data'],cfg)
     if args.footprint=='policy':predicted=run_spread(s['data'],cfg,q_table(s['data'],network),rewards,0,best['knob'],s['tree'])
-    random_maps=[fast_spread(s['data'],cfg,q_table(s['data'],network),rewards,START,k,1e9)[-1] for k in range(5)]
+    # The random policy keeps the selected threshold and burnout time, so only the action choice differs.
+    random_knob=dict(best['knob'],temperature=1e9) if args.footprint=='policy' else {'temperature':1e9,'theta_q':0,'tree_min':None,'sharpness':None}
+    random_maps=[run_spread(s['data'],cfg,q_table(s['data'],network),rewards,k,random_knob,s['tree']) for k in range(5)]
     baseline=float(np.mean([region_iou(m,s['target'],s['fit']) for m in random_maps]))
     held={}
     if s['held'] is not None:

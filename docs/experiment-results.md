@@ -62,17 +62,30 @@ Two optional additions go beyond the thesis:
 
 ### Results on mask v2
 
-Scores are IoU against mask v2. "Held-out" means the held-out blocks scored by the five unseen seeds. The random policy uses the same reward, knobs and threshold. Because the burned area is larger, the random baseline rises to about 0.41; the DQN gain over it is the number that matters.
+Scores are IoU against mask v2. "Held-out" means the held-out blocks scored by the five unseen seeds. Because the burned area is larger, the random baseline rises to 0.41–0.46; the DQN gain over it is the number that matters.
+
+The random policy now keeps the selected ignition threshold θ and burnout time, so only the action choice differs. Until run22 it was computed without them (marked *). Recomputed for run21 with the same knobs, it is about 0.43 instead of 0.41.
 
 | Run | Inputs and knobs | Held-out IoU (5 unseen seeds) | Random policy, held-out | Predicted cells |
 |---|---|---:|---:|---:|
-| run20 | run14 setting (MicroMet weather) | 0.384 | 0.405 | 1,533 |
-| run21 | run20 + burnout time (residence), C_f ≥ 0.067 | **0.455** | 0.411 | 1,150 |
-| run22 | run21 + KFS forest type (5th reward term, conifer share) | 0.419 | 0.411 | 1,277 |
+| run20 | run14 setting (MicroMet weather) | 0.384 | 0.405* | 1,533 |
+| run21 | run20 + burnout time (residence), C_f in [0.067, 0.5] | 0.455 | 0.411* (≈0.43 same knobs) | 1,150 |
+| run22 | run21 + KFS forest type (5th reward term, conifer share) | 0.419 | 0.411* | 1,277 |
+| run23 | run21, C_f in [0.067, 2] | **0.507** | 0.457 | 1,140 |
 
-run21 selected a burnout time of 8 steps (4 h), C_f 0.497, temperature 8 and θ 0.6. On the fit blocks its unseen seeds score 0.47–0.55 (mean 0.519) against 0.416 for the random policy with the same knobs. C_f, temperature and θ all sit at the top of their search ranges, so the optimum may lie outside them. The ranges were not widened afterwards, to avoid tuning for IoU alone.
+In run21, C_f, temperature and θ all sat at the top of their ranges. Widening only C_f, the one parameter with an independent physical reading (VIIRS timing, below), gave run23. There C_f settled inside the range at 0.79, with burnout time 8 steps (4 h), temperature 8 and θ 0.6. Temperature and θ are still at their upper bounds. They were not widened, because a higher temperature only moves the policy towards random. The unseen seeds score 0.54–0.57 on the fit blocks (mean 0.552, random 0.506).
 
-Averaging run21's setting over six unseen seeds × ten rollouts and cutting at a burn probability of 0.5 (fixed in advance) gives **held-out IoU 0.476** (1,121 cells), against 0.466 for the mean of the individual seeds. Cuts of 0.3 and 0.7 give 0.468 and 0.459.
+Averaging run23's setting over six unseen seeds × ten rollouts and cutting at a burn probability of 0.5 (fixed in advance) gives **held-out IoU 0.514** (1,190 cells), against 0.511 for the mean of the individual seeds. Cuts of 0.3 and 0.7 give 0.491 and 0.528. The run21 ensemble gave 0.476.
+
+**Timing check against VIIRS (not used for fitting).** At the first VIIRS pass after ignition (step 4.3), 635 cells of the mask were already detected burning, and 256 were first detected later. The table gives the share of each group reached by step 4, from the run23 policy (six rollouts).
+
+| C_f | Early cells reached (DQN) | Late cells reached too soon (DQN) | Early cells reached (random) | Late cells reached too soon (random) |
+|---:|---:|---:|---:|---:|
+| 0.5 | 0.16 | 0.03 | 0.97 | 0.60 |
+| 0.79 (selected) | 0.35 | 0.09 | 0.97 | 0.62 |
+| 1.2 | 0.59 | 0.15 | 0.97 | 0.63 |
+
+The learned policy keeps the order of burning better than the random policy, but it is too slow. Only a third of the cells that VIIRS saw burning are reached in time. Matching the speed needs a larger C_f, which overpredicts the extent with the current reward terms.
 
 The forest-type term did not improve the policy, although the map is informative: in the supervised reference below it raises AUC from 0.74 to 0.77.
 
