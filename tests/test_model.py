@@ -118,6 +118,21 @@ class ModelTests(unittest.TestCase):
         self.assertAlmostEqual(pine.reward((7,10),2,0,five)-pine.reward((7,10),2,0,Config(ndvi_mode='raw',weights=(.2,.1,.1,.4,0))),.2)
         self.assertAlmostEqual(reward_table(pine,five)[0,10,7,2],pine.reward((7,10),2,0,five),places=5)
         with self.assertRaises(ValueError):FirePathEnv(data,five)
+    def test_spotting_jumps_downwind(self):
+        import torch
+        from wildfire.experiment import QNetwork
+        torch.manual_seed(0);net=QNetwork();cfg=Config(size=30,horizon=6,diffusion_scale=.01);data=synthetic(0,cfg)
+        q,r=q_table(data,net),reward_table(data,cfg)
+        base=fast_spread(data,cfg,q,r,(5,15),seed=2,temperature=4.,residence=6)
+        spot=fast_spread(data,cfg,q,r,(5,15),seed=2,temperature=4.,residence=6,spot=1.,spot_m=800.)
+        ys,xs=np.nonzero(spot[-1]&~base[-1]);self.assertTrue(len(xs))
+        self.assertGreater(np.max(np.hypot(xs-5,ys-15)),1.5)
+    def test_wind_term_scales_with_speed(self):
+        cfg=Config(ndvi_mode='raw');data=synthetic(1,cfg)
+        calm=Dataset(dict(data.fields,wind_speed_ms=np.zeros_like(data.fields['wind_speed_ms'])),data.metadata)
+        scaled=Config(ndvi_mode='raw',wind_ref_ms=5.);still=Config(ndvi_mode='raw',weights=cfg.weights[:3]+(0,))
+        self.assertAlmostEqual(calm.reward((7,10),2,0,scaled),calm.reward((7,10),2,0,still))
+        np.testing.assert_allclose(reward_table(data,scaled)[0,10,7],[data.reward((7,10),a,0,scaled) for a in range(9)],atol=1e-5)
     def test_micromet_downscaling(self):
         from data.synth_weather import downscale
         z=np.add.outer(np.zeros(50),np.linspace(0,500,50))

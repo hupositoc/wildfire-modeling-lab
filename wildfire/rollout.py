@@ -50,13 +50,17 @@ def q_table(data,network):
     obs=observation_table(data)
     with torch.no_grad():return network(torch.from_numpy(obs.reshape(-1,8))).numpy().reshape(obs.shape[:3]+(9,))
 
-def fast_spread(data,cfg,q,rewards,start=(6,10),seed=0,temperature=1.,policy='softmax',theta=0.,barrier=None,sharpness=None,residence=None):
+def fast_spread(data,cfg,q,rewards,start=(6,10),seed=0,temperature=1.,policy='softmax',theta=0.,barrier=None,sharpness=None,residence=None,
+                spot=None,spot_m=500.,spot_ref_ms=5.):
     """Vectorised spread with the same rules as spread(); fully enclosed sources are skipped.
 
     Beyond the thesis: theta raises the ignition reward threshold (A), barrier marks cells that
     cannot burn (B), and sharpness turns the threshold into P(ignite)=sigmoid(sharpness*(r-theta)) (E).
     residence is a burnout time in steps: a cell can ignite neighbours only for that many steps after
     it caught fire, so a front that meets poor conditions dies out instead of waiting indefinitely.
+    spot is the chance per step that a burning cell throws a firebrand (spotting). It lands downwind,
+    direction wind_to_deg plus N(0, 15 deg), at an exponential distance with mean spot_m scaled by
+    wind speed / spot_ref_ms, and ignites the cell if its fuel reward (stay action) reaches theta.
     """
     rng=np.random.default_rng(seed);n=cfg.size
     burned=np.zeros((n,n),bool);burned[start[1],start[0]]=True
@@ -67,6 +71,15 @@ def fast_spread(data,cfg,q,rewards,start=(6,10),seed=0,temperature=1.,policy='so
     for t in range(cfg.horizon):
         speed=float(data.fields['wind_speed_ms'][t].mean())
         if residence is not None:active&=ignited>t-residence
+        if spot:
+            ys,xs=np.nonzero(active&(rng.random((n,n))<spot))
+            if len(xs):
+                angle=np.deg2rad(data.fields['wind_to_deg'][t,ys,xs]+rng.normal(0,15,len(xs)))
+                d=rng.exponential(spot_m/cfg.cell_m,len(xs))*data.fields['wind_speed_ms'][t,ys,xs]/spot_ref_ms
+                nx=np.rint(xs+d*np.cos(angle)).astype(int);ny=np.rint(ys+d*np.sin(angle)).astype(int)
+                keep=(nx>=0)&(nx<n)&(ny>=0)&(ny<n);nx,ny=nx[keep],ny[keep]
+                ok=fuel[t,ny,nx]&(rewards[t,ny,nx,8]>=theta)&~burned[ny,nx]
+                ignited[ny[ok],nx[ok]]=t;burned[ny[ok],nx[ok]]=True;active[ny[ok],nx[ok]]=True
         for _ in range(diffusion_steps(speed,cfg)):
             open_=np.pad(~burned,1)
             free=np.zeros((n,n),bool)

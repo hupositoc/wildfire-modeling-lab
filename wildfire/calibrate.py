@@ -79,8 +79,9 @@ def visit_scores(frequency,reward_sum,target,region):
     return {float(t):region_iou(footprint(frequency,reward_sum,t),target,region) for t in TAUS}
 
 def knobs(spread):
-    return [dict(temperature=t,theta_q=h,tree_min=m,sharpness=k,**({'residence':d} if d is not None else {})) for t in spread['temperatures'] for h in spread['thetas']
+    out=[dict(temperature=t,theta_q=h,tree_min=m,sharpness=k,**({'residence':d} if d is not None else {})) for t in spread['temperatures'] for h in spread['thetas']
             for m in spread['tree_mins'] for k in spread['sharpness'] for d in spread.get('residences',[None])]
+    return [dict(k,spot=s) if s else k for k in out for s in spread.get('spots',[None])]
 
 def reward_stats(rewards,spread):
     fuel=rewards[rewards>-1]
@@ -92,7 +93,8 @@ def run_spread(data,cfg,q,rewards,seed,knob,tree=None,stats=None):
     stats=stats or reward_stats(rewards,{'thetas':[knob['theta_q']]})
     theta=stats['theta'][knob['theta_q']];sharpness=None if knob['sharpness'] is None else knob['sharpness']/stats['std']
     barrier=None if knob['tree_min'] is None else tree<knob['tree_min']
-    return fast_spread(data,cfg,q,rewards,START,seed,knob['temperature'],theta=theta,barrier=barrier,sharpness=sharpness,residence=knob.get('residence'))[-1]
+    return fast_spread(data,cfg,q,rewards,START,seed,knob['temperature'],theta=theta,barrier=barrier,sharpness=sharpness,residence=knob.get('residence'),
+                       spot=knob.get('spot'),spot_m=STATE.get('spread',{}).get('spot_m',500.))[-1]
 
 def policy_scores(data,cfg,network,target,spread,regions,tree=None,rollouts=3):
     q=q_table(data,network);rewards=reward_table(data,cfg);stats=reward_stats(rewards,spread);out=[{} for _ in regions]
@@ -119,7 +121,7 @@ def init_worker(dataset,mask,ndvi_mode,episodes,footprint_mode,ji_reward,spread,
     data=Dataset.load(dataset);target=np.load(str(mask)).astype(bool)
     horizon,size,_=data.fields['ndvi'].shape;fit,held=holdout_regions(holdout,size)
     # The JI reward never reaches held-out cells, so their score measures generalisation.
-    STATE.update(data=data,target=target,cfg=Config(size=size,horizon=horizon,ndvi_mode=ndvi_mode,consumed_fuel=consumed_fuel),episodes=episodes,
+    STATE.update(data=data,target=target,cfg=Config(size=size,horizon=horizon,ndvi_mode=ndvi_mode,consumed_fuel=consumed_fuel,wind_ref_ms=spread.get('wind_ref')),episodes=episodes,
                  footprint=footprint_mode,bonus=ji_reward*(2*target-1.)*fit if ji_reward else None,fit=fit,held=held,
                  spread=spread,tree=load_tree(barrier) if barrier else None)
 
@@ -177,6 +179,9 @@ def main():
     parser.add_argument('--barrier',type=Path,help='(B) extras.csv with WorldCover tree_fraction')
     parser.add_argument('--tree-mins',type=float,nargs='+',default=[],help='(B) cells below this tree fraction cannot burn')
     parser.add_argument('--residences',type=int,nargs='+',default=[],help='(F) burnout time in steps; omitted keeps cells active forever')
+    parser.add_argument('--spots',type=float,nargs='+',default=[],help='(G) spotting chance per burning cell per step; omitted disables spotting')
+    parser.add_argument('--spot-m',type=float,default=500.,help='(G) mean spotting distance in metres at 5 m/s wind')
+    parser.add_argument('--wind-ref',type=float,help='(H) scale the wind reward term by wind speed / this value (m/s)')
     parser.add_argument('--sharpness',type=float,nargs='+',default=[],help='(E) P(ignite)=sigmoid(k*(r-theta)/std(r)); omitted means hard threshold')
     parser.add_argument('--holdout',choices=['none','checker'],default='none',help='checker: JI reward and search objective use alternate 10x10 blocks; the rest is reported as held-out')
     parser.add_argument('--consumed-fuel',action='store_true',help='re-entering a cell burned earlier in the episode earns nothing (beyond the thesis)')
@@ -185,7 +190,8 @@ def main():
     args=parser.parse_args();rng=np.random.default_rng(args.search_seed);history=[];started=time.perf_counter()
     CF_RANGE=tuple(args.cf_range);K=5 if args.fuel_type else 4
     if args.tree_mins and not args.barrier:parser.error('--tree-mins needs --barrier')
-    spread={'temperatures':args.temperatures,'thetas':args.thetas,'tree_mins':[None]+args.tree_mins,'sharpness':[None]+args.sharpness,'residences':args.residences or [None]}
+    spread={'temperatures':args.temperatures,'thetas':args.thetas,'tree_mins':[None]+args.tree_mins,'sharpness':[None]+args.sharpness,'residences':args.residences or [None],
+            'spots':args.spots or [None],'spot_m':args.spot_m,'wind_ref':args.wind_ref}
     setup=(args.dataset,args.mask,args.ndvi_mode,args.episodes,args.footprint,args.ji_reward,spread,args.barrier,args.holdout,args.consumed_fuel)
     init_worker(*setup)
     pool=ProcessPoolExecutor(args.workers,initializer=init_worker,initargs=setup)
@@ -234,7 +240,8 @@ def main():
             'dqn_gain_over_random':best['jaccard']-baseline,
             'confirm_unseen_seeds':confirm,'observed_cells':int(s['target'].sum()),'predicted_cells':int(predicted.sum()),
             'footprint':args.footprint,'knob':'tau (visit fraction)' if args.footprint=='visits' else 'temperature, theta_q, tree_min, sharpness',
-            'beyond_thesis':{'thetas':args.thetas,'barrier':str(args.barrier) if args.barrier else None,'tree_mins':args.tree_mins,'sharpness':args.sharpness},
+            'beyond_thesis':{'thetas':args.thetas,'barrier':str(args.barrier) if args.barrier else None,'tree_mins':args.tree_mins,'sharpness':args.sharpness,
+                           'residences':args.residences,'spots':args.spots,'spot_m':args.spot_m,'wind_ref':args.wind_ref},
             'ji_reward_lambda':args.ji_reward,'mask':str(args.mask),
             'search':{'simplex_lhs':args.lhs,'bayesian_rounds':args.rounds,'batch':args.batch,'episodes':args.episodes,'search_seeds':args.seeds,
                       'cf_range_log':CF_RANGE,'tau_grid':[float(TAUS[0]),float(TAUS[-1])],'temperatures':args.temperatures},

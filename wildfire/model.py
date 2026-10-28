@@ -24,6 +24,9 @@ class Config:
     # Beyond the thesis: a cell already burned in this episode has no fuel left, so re-entering
     # it (including the stay action) earns nothing. Off reproduces the printed reward.
     consumed_fuel:bool=False
+    # Beyond the thesis: when set, the wind term is scaled by wind speed / wind_ref_ms, so wind
+    # direction matters more in strong wind and little in calm air. None keeps the printed reward.
+    wind_ref_ms:float=None
 
 def emc_percent(temp_c,rh):
     """Hailwood-Horrobin temperature-dependent form, T in Celsius, RH fraction.
@@ -94,6 +97,7 @@ class Dataset:
         vegetation=ndvi/50.-1 if cfg.ndvi_mode=='literal' else ndvi
         slope=angular_alignment(action,f['upslope_deg'][t,y,x])
         wind=angular_alignment(action,f['wind_to_deg'][t,y,x])
+        if cfg.wind_ref_ms:wind*=float(f['wind_speed_ms'][t,y,x])/cfg.wind_ref_ms
         terms=[moisture,vegetation,slope,wind]
         if len(cfg.weights)==5:terms.append(float(f['conifer_fraction'][t,y,x]))
         return float(np.dot(cfg.weights,terms))
@@ -113,7 +117,9 @@ def reward_table(data,cfg):
     norms=np.linalg.norm(ACTIONS,axis=1);unit=np.divide(ACTIONS,norms[:,None],out=np.zeros(ACTIONS.shape),where=norms[:,None]>0)
     align=lambda deg:np.cos(np.deg2rad(deg))[...,None]*unit[:,0]+np.sin(np.deg2rad(deg))[...,None]*unit[:,1]
     w=cfg.weights
-    table=w[0]*moisture[...,None]+w[1]*vegetation[...,None]+w[2]*align(f['upslope_deg'])+w[3]*align(f['wind_to_deg'])
+    wind=align(f['wind_to_deg'])
+    if cfg.wind_ref_ms:wind=wind*(f['wind_speed_ms']/cfg.wind_ref_ms)[...,None]
+    table=w[0]*moisture[...,None]+w[1]*vegetation[...,None]+w[2]*align(f['upslope_deg'])+w[3]*wind
     if len(w)==5:table=table+w[4]*f['conifer_fraction'][...,None]
     return np.where(ndvi[...,None]<=0,-1.,table)
 

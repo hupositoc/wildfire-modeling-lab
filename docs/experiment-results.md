@@ -72,6 +72,8 @@ The random policy now keeps the selected ignition threshold θ and burnout time,
 | run21 | run20 + burnout time (residence), C_f in [0.067, 0.5] | 0.455 | 0.411* (≈0.43 same knobs) | 1,150 |
 | run22 | run21 + KFS forest type (5th reward term, conifer share) | 0.419 | 0.411* | 1,277 |
 | run23 | run21, C_f in [0.067, 2] | **0.507** | 0.457 | 1,140 |
+| run24 | run23 + spotting | 0.478 | 0.461 | 1,353 |
+| run25 | run24 + wind term scaled by wind speed | 0.475 | 0.488 | 1,013 |
 
 In run21, C_f, temperature and θ all sat at the top of their ranges. Widening only C_f, the one parameter with an independent physical reading (VIIRS timing, below), gave run23. There C_f settled inside the range at 0.79, with burnout time 8 steps (4 h), temperature 8 and θ 0.6. Temperature and θ are still at their upper bounds. They were not widened, because a higher temperature only moves the policy towards random. The unseen seeds score 0.54–0.57 on the fit blocks (mean 0.552, random 0.506).
 
@@ -86,6 +88,13 @@ Averaging run23's setting over six unseen seeds × ten rollouts and cutting at a
 | 1.2 | 0.59 | 0.15 | 0.97 | 0.63 |
 
 The learned policy keeps the order of burning better than the random policy, but it is too slow. Only a third of the cells that VIIRS saw burning are reached in time. Matching the speed needs a larger C_f, which overpredicts the extent with the current reward terms.
+
+**Spotting and wind speed (run24, run25).** Two further additions go beyond the thesis:
+
+- **Spotting (`--spots`, `--spot-m`).** Each step, a burning cell throws a firebrand with a searched probability (0, 0.02, 0.05 or 0.1). The brand lands downwind, with the direction spread by N(0, 15°). Its distance is exponential with a mean of 500 m at 5 m/s, scaled by wind speed. The 500 m mean is a reconstruction choice, not fitted. The landing cell ignites if its fuel reward (stay action) reaches θ.
+- **Wind speed in the reward (`--wind-ref 5`).** The wind-alignment term is multiplied by wind speed / 5 m/s, so direction matters little in calm air.
+
+run24 selected a spotting chance of 0.02. Spotting fixed the timing problem: with run24's policy, 83% of the first-pass cells are reached by step 4, against 35% for run23. 36% of the late cells are also reached too early, against 61% for the random policy. The fit blocks rose to 0.565, but held-out IoU fell to 0.478, only +0.017 over random. Scaling the wind term (run25) put held-out IoU below the random policy (0.475 vs 0.488). Neither addition improves the extent score on unseen blocks, so run23 remains the reported extent result. Spotting is kept as an option because it brings the timing closer to VIIRS.
 
 The forest-type term did not improve the policy, although the map is informative: in the supervised reference below it raises AUC from 0.74 to 0.77.
 
