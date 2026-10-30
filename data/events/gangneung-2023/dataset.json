@@ -1,0 +1,60 @@
+{
+  "kind": "synthetic",
+  "event_id": "gangneung-2023",
+  "version": "reconstruction-v1",
+  "original_thesis_export": false,
+  "grid_bounds": [
+    128.86236771862212,
+    37.77440382779562,
+    128.9192094040344,
+    37.819622414443465
+  ],
+  "grid_origin": "lower-left",
+  "shape": [
+    18,
+    50,
+    50
+  ],
+  "start_utc": "2023-04-10T23:00:00+00:00",
+  "step_seconds": 1800,
+  "last_timestamp_ms": 1681198200000.0,
+  "collections": [
+    "COPERNICUS/S2_SR_HARMONIZED",
+    "JAXA/ALOS/AW3D30/V4_1",
+    "ERA5 (Open-Meteo) + MicroMet downscaling"
+  ],
+  "source_files_sha256": {
+    "static": "706359014af424c08b928c8cb5aea3e81cb0983879433552841e9f0d4dfcee34",
+    "weather": "1e98030b704e0270dca92da64b8307f2bdd226d794a50a2df60b478dea44b74e",
+    "scenes": "3e6ebfb766e6aea98bafd517d0adcc628805371082fddfa35f1b4b557316b527"
+  },
+  "processing": [
+    "2021 annual mean scene NDVI, scene cloud fraction <=20%",
+    "cell-mean terrain aspect represented by circular components",
+    "hourly u/v/T/dewpoint linearly interpolated to 30-minute steps",
+    "RH derived with documented Magnus approximation",
+    "no observed burned-area mask generated",
+    "spatial sampling does not increase native weather resolution"
+  ],
+  "source_url": "https://developers.google.com/earth-engine/datasets/catalog",
+  "reproduction_status": "reconstructed inputs; original scene/classifier/hyperparameter choices unresolved",
+  "ignition_cell": [
+    13,
+    19
+  ],
+  "weather": {
+    "kind": "synthetic",
+    "generator": "data/synth_weather.py",
+    "base": "ERA5 0.25 deg via Open-Meteo archive, elevation=nan (raw grid value)",
+    "grid_point": [
+      37.75,
+      129.0
+    ],
+    "grid_elevation_m": 0.0,
+    "downscaling": "MicroMet (Liston & Elder 2006), March lapse rates",
+    "coupling": 1.0,
+    "eta_cells": 5,
+    "not_era5_land": true,
+    "target_mask_used": false
+  }
+}

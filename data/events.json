@@ -1,0 +1,15 @@
+{
+ "_note": "Reported ignition village (OpenStreetMap centroid of the named ri/dong), ignition and main-fire-out times in KST from Korea Forest Service statements as quoted by the press. None of these fields is read from a burned-area mask.",
+ "uljin-2022": {"place": "Uljin-gun Buk-myeon Ducheon-ri", "lat": 37.02163, "lon": 129.26994, "ignition_kst": "2022-03-04T11:17", "contained_kst": "2022-03-13T09:00",
+   "sources": ["https://www.forest.go.kr"]},
+ "gangneung-2023": {"place": "Gangneung-si Nangok-dong", "lat": 37.78981, "lon": 128.87634, "ignition_kst": "2023-04-11T08:22", "contained_kst": "2023-04-11T16:30",
+   "sources": ["https://mobile.newsis.com/view/NISX20230411_0002262591", "https://m.seoul.co.kr/news/2023/04/11/20230411500120"]},
+ "goseong-2019": {"place": "Goseong-gun Toseong-myeon Wonam-ri", "lat": 38.20637, "lon": 128.48663, "ignition_kst": "2019-04-04T19:17", "contained_kst": "2019-04-05T08:15",
+   "sources": ["https://m.seoul.co.kr/news/2019/04/05/20190405800001", "https://www.newsis.com/view/NISX20190405_0000611584"]},
+ "andong-2020": {"place": "Andong-si Pungcheon-myeon Ingeum-ri", "lat": 36.52727, "lon": 128.55241, "ignition_kst": "2020-04-24T15:39", "contained_kst": "2020-04-26T08:00",
+   "sources": ["https://kbmaeil.com/article/202004240277127", "https://kbmaeil.com/article/202004260277242"]},
+ "miryang-2022": {"place": "Miryang-si Bubuk-myeon Chunhwa-ri", "lat": 35.528, "lon": 128.73277, "ignition_kst": "2022-05-31T09:25", "contained_kst": "2022-06-03T10:00",
+   "sources": ["https://www.newsis.com/view/NISX20220603_0001895896"]},
+ "hapcheon-2022": {"place": "Hapcheon-gun Yulgok-myeon Noyang-ri", "lat": 35.63821, "lon": 128.18266, "ignition_kst": "2022-02-28T14:26", "contained_kst": "2022-03-01T18:00",
+   "sources": ["https://www.imaeil.com/page/view/2022030117303582615", "https://kpinews.kr/newsView/179548267385969"]}
+}

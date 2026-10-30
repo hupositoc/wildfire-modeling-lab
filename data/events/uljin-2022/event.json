@@ -1,0 +1,28 @@
+{
+ "event": "uljin-2022",
+ "bounds": [
+  129.25087561777434,
+  37.010461753552825,
+  129.30714047228196,
+  37.055680340200674
+ ],
+ "start_utc": "2022-03-04T02:00:00+00:00",
+ "steps": 100,
+ "aoi_wind": {
+  "wind_to_deg_ccw_from_east": 57.5,
+  "mean_speed_ms": 5.39
+ },
+ "reported_cell": [
+  16,
+  12
+ ],
+ "ignition_cell": [
+  15,
+  13
+ ],
+ "ignition_moved_m": 141.4213562373095,
+ "burned_cells": 550,
+ "burned_fraction": 0.22,
+ "viirs_cells": 1880,
+ "mask_window": "2021-03-30 (pre) / 2022-04-04 (post)"
+}

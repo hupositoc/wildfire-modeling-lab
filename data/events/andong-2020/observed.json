@@ -1,0 +1,32 @@
+{
+ "kind": "observational",
+ "event_id": "andong-2020",
+ "version": "multi-event-v1",
+ "source_url": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a",
+ "mask_method": "pixel dNBR>=0.16 (pre: previous-year clear scene nearest post-365 d); cell burned if >=50% of valid pixels burned; water/cloud excluded via SCL",
+ "time_window": "2019-06-09 (pre) / 2020-06-06 (post)",
+ "pre_aoi_cloud": 0.007036111111111111,
+ "post_aoi_cloud": 0.011863888888888889,
+ "pre_items": [
+  "S2A_52SDF_20190609_0_L2A"
+ ],
+ "post_items": [
+  "S2A_52SDF_20200606_1_L2A",
+  "S2A_52SDF_20200606_0_L2A"
+ ],
+ "water_cells": 12,
+ "grid_bounds": [
+  128.54062374315416,
+  36.50827466558886,
+  128.5965211169229,
+  36.553493252236706
+ ],
+ "grid_origin": "lower-left",
+ "shape": [
+  50,
+  50
+ ],
+ "burned_cells": 402,
+ "mask_sha256": "43eb64d32068c174388843fa3078756fe10275ecadc5d3bb1b15a8f298006a62",
+ "built_utc": "2026-10-30T18:00:29.253805+00:00"
+}

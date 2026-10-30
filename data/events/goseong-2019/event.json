@@ -1,0 +1,28 @@
+{
+ "event": "goseong-2019",
+ "bounds": [
+  128.4727695904842,
+  38.19071634351755,
+  128.52993493735661,
+  38.2359349301654
+ ],
+ "start_utc": "2019-04-04T10:00:00+00:00",
+ "steps": 28,
+ "aoi_wind": {
+  "wind_to_deg_ccw_from_east": 30.8,
+  "mean_speed_ms": 10.0
+ },
+ "reported_cell": [
+  12,
+  17
+ ],
+ "ignition_cell": [
+  14,
+  21
+ ],
+ "ignition_moved_m": 447.21359549995793,
+ "burned_cells": 389,
+ "burned_fraction": 0.156,
+ "viirs_cells": 300,
+ "mask_window": "2018-05-05 (pre) / 2019-05-03 (post)"
+}

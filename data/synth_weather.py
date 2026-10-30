@@ -22,7 +22,10 @@ DY=.045/N*111320.
 DX=.066/N*111320.*np.cos(np.radians(CENTER[0]))
 
 def era5(start,end):
-    params=dict(latitude=CENTER[0],longitude=CENTER[1],start_date=start,end_date=end,timezone='GMT',models='era5',
+    return era5_at(CENTER[0],CENTER[1],start,end)
+
+def era5_at(lat,lon,start,end):
+    params=dict(latitude=lat,longitude=lon,start_date=start,end_date=end,timezone='GMT',models='era5',
                 elevation='nan',wind_speed_unit='ms',hourly='temperature_2m,dew_point_2m,wind_speed_10m,wind_direction_10m')
     d=requests.get(ARCHIVE,params=params,timeout=120).json()
     if 'hourly' not in d:raise RuntimeError(d)
@@ -56,14 +59,14 @@ def downscale(z,z_ref,temp_c,dew_c,speed,wind_from,coupling,eta):
     s=speed*weight/weight.mean()
     return temp,dew,-s*np.sin(turned),-s*np.cos(turned)
 
-def main():
+def main(argv=None):
     parser=argparse.ArgumentParser()
     parser.add_argument('--extras',type=Path,default=Path('data/raw/extras.csv'))
     parser.add_argument('--output',type=Path,default=Path('data/raw/weather_micromet.csv'))
     parser.add_argument('--start',default='2022-03-04');parser.add_argument('--end',default='2022-03-06')
     parser.add_argument('--coupling',type=float,default=1.,help='0 keeps uniform ERA5, 1 is the MicroMet default')
     parser.add_argument('--eta',type=int,default=5,help='curvature length scale in cells')
-    args=parser.parse_args()
+    args=parser.parse_args(argv)
     z=load_elevation(args.extras);d=era5(args.start,args.end);h=d['hourly']
     with args.output.open('w',newline='',encoding='utf-8') as f:
         w=csv.writer(f);w.writerow(['time_ms','x','y','temperature_2m','dewpoint_temperature_2m','u_component_of_wind_10m','v_component_of_wind_10m'])

@@ -136,15 +136,16 @@ def to_cells(lat,lon,field):
             out[y,x]=np.sum(w*field.flat[near])/np.sum(w)
     return out
 
-def main():
+def main(argv=None):
     parser=argparse.ArgumentParser()
     parser.add_argument('--out',type=Path,default=Path('data/raw'))
     parser.add_argument('--skip-static',action='store_true');parser.add_argument('--skip-weather',action='store_true')
     parser.add_argument('--workers',type=int,default=8)
+    parser.add_argument('--year',type=int,default=2021,help='NDVI year (the year before the fire)')
     parser.add_argument('--skip-extras',action='store_true',help='skip elevation and WorldCover tree fraction (extras.csv)')
-    args=parser.parse_args();args.out.mkdir(parents=True,exist_ok=True)
+    args=parser.parse_args(argv);args.out.mkdir(parents=True,exist_ok=True)
     if not args.skip_static:
-        ndvi,manifest=annual_ndvi(2021,args.workers)
+        ndvi,manifest=annual_ndvi(args.year,args.workers)
         slope,asin,acos,dem_id,_=terrain()
         maps={'ndvi':cells(ndvi),'slope':cells(slope),'aspect_sin':cells(asin),'aspect_cos':cells(acos)}
         with (args.out/'static.csv').open('w',newline='',encoding='utf-8') as f:
@@ -153,7 +154,7 @@ def main():
                 for x in range(N):w.writerow([x,y]+[float(maps[k][y,x]) for k in maps])
         with (args.out/'scenes.csv').open('w',newline='',encoding='utf-8') as f:
             w=csv.DictWriter(f,fieldnames=list(manifest[0]));w.writeheader();w.writerows(manifest)
-        (args.out/'static_sources.json').write_text(json.dumps({'sentinel2':'earth-search sentinel-2-l2a 2021, per-scene NDVI(B08,B04), AOI SCL cloud fraction <=0.2','dem':'planetary-computer alos-dem '+dem_id,'scenes_used':sum(m['used'] for m in manifest),'scenes_total':len(manifest),'built_utc':datetime.now(timezone.utc).isoformat()},indent=2),encoding='utf-8')
+        (args.out/'static_sources.json').write_text(json.dumps({'sentinel2':'earth-search sentinel-2-l2a %d,'%args.year+' per-scene NDVI(B08,B04), AOI SCL cloud fraction <=0.2','dem':'planetary-computer alos-dem '+dem_id,'scenes_used':sum(m['used'] for m in manifest),'scenes_total':len(manifest),'built_utc':datetime.now(timezone.utc).isoformat()},indent=2),encoding='utf-8')
         print('static ok: scenes used',sum(m['used'] for m in manifest),'of',len(manifest))
     if not args.skip_extras:
         _,_,_,dem_id,z=terrain();tree,wc_id=landcover()

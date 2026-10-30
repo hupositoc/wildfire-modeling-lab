@@ -12,14 +12,16 @@ import numpy as np
 
 def digest(path):return hashlib.sha256(path.read_bytes()).hexdigest()
 
-def main():
+def main(argv=None):
     parser=argparse.ArgumentParser()
     parser.add_argument('--static',type=Path,required=True);parser.add_argument('--weather',type=Path,required=True)
     parser.add_argument('--scenes',type=Path,required=True);parser.add_argument('--output',type=Path,required=True)
-    parser.add_argument('--steps',type=int,choices=[99,100],required=True,help='Author must resolve the paper endpoint/count inconsistency.')
+    parser.add_argument('--steps',type=int,required=True,help='99 or 100 for the thesis event (the paper is inconsistent); other events use their own horizon')
     parser.add_argument('--start',default='2022-03-04T02:00:00+00:00')
+    parser.add_argument('--event-id',default='uljin-2022');parser.add_argument('--bounds',type=float,nargs=4,default=[129.29,37.03,129.356,37.075])
+    parser.add_argument('--ignition-cell',type=int,nargs=2,help='x y; calibration falls back to (6,10) for the thesis grid')
     parser.add_argument('--weather-meta',type=Path,help='JSON from data/synth_weather.py; marks the tensor synthetic')
-    args=parser.parse_args();n=50
+    args=parser.parse_args(argv);n=50
     start=datetime.fromisoformat(args.start)
     if start.tzinfo is None:parser.error('Start timestamp requires a UTC offset.')
     requested=start.timestamp()*1000+np.arange(args.steps)*1800000
@@ -59,14 +61,15 @@ def main():
     if np.any((fields['ndvi']<-1)|(fields['ndvi']>1)):raise ValueError('Raw NDVI outside [-1,1].')
     args.output.parent.mkdir(parents=True,exist_ok=True)
     np.savez_compressed(str(args.output),**{k:v.astype(np.float32) for k,v in fields.items()})
-    metadata={'kind':'observational','event_id':'uljin-2022','version':'reconstruction-v1','original_thesis_export':False,
-              'grid_bounds':[129.29,37.03,129.356,37.075],'grid_origin':'lower-left','shape':[args.steps,n,n],
+    metadata={'kind':'observational','event_id':args.event_id,'version':'reconstruction-v1','original_thesis_export':False,
+              'grid_bounds':list(args.bounds),'grid_origin':'lower-left','shape':[args.steps,n,n],
               'start_utc':start.isoformat(),'step_seconds':1800,'last_timestamp_ms':float(requested[-1]),
               'collections':['COPERNICUS/S2_SR_HARMONIZED','JAXA/ALOS/AW3D30/V4_1','ECMWF/ERA5_LAND/HOURLY'],
               'source_files_sha256':{'static':digest(args.static),'weather':digest(args.weather),'scenes':digest(args.scenes)},
               'processing':['2021 annual mean scene NDVI, scene cloud fraction <=20%','cell-mean terrain aspect represented by circular components','hourly u/v/T/dewpoint linearly interpolated to 30-minute steps','RH derived with documented Magnus approximation','no observed burned-area mask generated','spatial sampling does not increase native weather resolution'],
               'source_url':'https://developers.google.com/earth-engine/datasets/catalog',
               'reproduction_status':'reconstructed inputs; original scene/classifier/hyperparameter choices unresolved'}
+    if args.ignition_cell:metadata['ignition_cell']=list(args.ignition_cell)
     if args.weather_meta:
         weather_meta=json.loads(args.weather_meta.read_text(encoding='utf-8'))
         metadata.update(kind='synthetic',weather=weather_meta,collections=metadata['collections'][:2]+['ERA5 (Open-Meteo) + MicroMet downscaling'])

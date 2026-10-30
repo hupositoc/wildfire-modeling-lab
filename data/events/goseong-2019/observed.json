@@ -1,0 +1,32 @@
+{
+ "kind": "observational",
+ "event_id": "goseong-2019",
+ "version": "multi-event-v1",
+ "source_url": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a",
+ "mask_method": "pixel dNBR>=0.16 (pre: previous-year clear scene nearest post-365 d); cell burned if >=50% of valid pixels burned; water/cloud excluded via SCL",
+ "time_window": "2018-05-05 (pre) / 2019-05-03 (post)",
+ "pre_aoi_cloud": 0.014833333333333334,
+ "post_aoi_cloud": 0.0,
+ "pre_items": [
+  "S2A_52SDH_20180505_0_L2A"
+ ],
+ "post_items": [
+  "S2A_52SDH_20190503_1_L2A",
+  "S2A_52SDH_20190503_0_L2A"
+ ],
+ "water_cells": 13,
+ "grid_bounds": [
+  128.4727695904842,
+  38.19071634351755,
+  128.52993493735661,
+  38.2359349301654
+ ],
+ "grid_origin": "lower-left",
+ "shape": [
+  50,
+  50
+ ],
+ "burned_cells": 389,
+ "mask_sha256": "84b41d9a39f2a83d09500dc9ceec8f743a92412f516c9ccf94b9ca39bd24f4e8",
+ "built_utc": "2026-10-30T17:59:57.105972+00:00"
+}

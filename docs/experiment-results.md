@@ -144,6 +144,48 @@ Averaging run14's setting over six unseen seeds × ten rollouts and cutting the 
 - The terrain fuel-moisture offset (`data/add_terrain_moisture.py`, K=2 percentage points from Rothermel 1983) lowered held-out IoU from 0.327 to 0.233 at fixed run14 weights, averaged over 8 seeds. K was not re-fitted to rescue it.
 - **Physical spread speed.** VIIRS S-NPP first detections (`tools/viirs_arrival.py`, keyless FIRMS archive) show most of the AOI burning on the first pass after ignition (step 4.3). Reaching those cells in time needs C_f ≥ 0.067 (median distance) to 0.097 (90th percentile), while the unconstrained searches settled near 0.016. Constraining C_f to [0.067, 0.5] made the unseen seeds more consistent (run16: 0.34–0.37 on the fit blocks), but the footprint overpredicted (1,801 cells vs 651) and held-out IoU fell to 0.307. Widening the threshold grid (run17) did not help. C_f and the rollout temperature then sat at the top of their ranges, i.e. the search preferred near-random fast spread, and held-out IoU was 0.273. With the current reward terms, the model cannot match both the observed speed and the observed extent.
 
+## Cross-fire evaluation (leave one fire out)
+
+Six Korean fires with different terrain and wind are built with one rule by `data/build_event.py` (registry `data/events.json`):
+
+- **Grid.** 50×50 cells of 100 m. The AOI is fixed before any burn map is read. Its centre lies 1.5 km downwind of the reported ignition village, using the ERA5 mean wind of the first six hours.
+- **Horizon.** From ignition to the reported main-fire-out time, capped at 100 half-hour steps.
+- **Mask.** As for Uljin v3: the first clear scene from 21 days after containment, against the previous-year scene nearest the same date; pixel dNBR ≥ 0.16; a cell is burned when at least half of its pixels are.
+- **Ignition cell.** The village centroid moved to the nearest burned cell, 100–450 m.
+
+Because the AOI rule is applied to Uljin too, its AOI now sits around the ignition village (Ducheon-ri), and 22% of it burned (58% in the thesis AOI).
+
+For each held-out fire, all settings are chosen on the other five fires only; the held-out fire is then scored once on unseen seeds.
+
+| Held-out fire | Burned share | DQN (thesis model) | Random policy, same settings | Stochastic CA | All burned |
+|---|---:|---:|---:|---:|---:|
+| Uljin 2022 | 22% | 0.079 | 0.289 | 0.353 | 0.220 |
+| Gangneung 2023 | 10% | 0.188 | 0.167 | 0.393 | 0.096 |
+| Goseong 2019 | 16% | 0.040 | 0.235 | 0.262 | 0.156 |
+| Andong 2020 | 16% | 0.013 | 0.161 | 0.292 | 0.161 |
+| Miryang 2022 | 11% | 0.057 | 0.079 | 0.430 | 0.109 |
+| Hapcheon 2022 | 20% | 0.008 | 0.017 | 0.174 | 0.200 |
+| **Mean (SD)** | | **0.064 (0.061)** | 0.158 | **0.317 (0.086)** | 0.157 |
+
+**DQN (run29, `wildfire/cross_event.py`).**
+
+- **Design.**
+  - 48 fixed simplex-LHS points (reward weights and C_f, 0.005–2), evaluated on every fire.
+  - 80 spread knobs: temperature, θ and burnout time.
+  - No Jaccard training reward, so a policy never sees its own fire's map. Consumed fuel is on.
+  - No Bayesian rounds, because an adaptive search guided by all fires would let the held-out fire steer the design.
+- **Result.** The settings that do best on five fires transfer badly to the sixth. The chosen C_f ranges from 0.04 to 1.37 between folds, and the footprint ranges from 67 to 1,562 cells. The held-out mean is below the random policy and below "all burned".
+- **In-sample.** The best point per fire, fitted to that fire, gives 0.37–0.49.
+
+**Stochastic CA (run30, `wildfire/ca.py`).**
+
+- **Model.** Spread probability to each neighbour follows Alexandridis et al. (2008, *Appl. Math. Comput.* 204:191): wind speed and angle, and the slope angle between cells from AW3D30. It adds NDVI and EMC fuel-moisture factors from the thesis inputs.
+- **Parameters.** Eight global parameters, fitted by differential evolution to the mean IoU of the training fires.
+- **Result.** It beats "all burned" on five of six fires, by about 0.13–0.32. Hapcheon (0.174 vs 0.200) is the exception.
+- **In-sample.** Fitted to all six fires at once, it gives 0.31–0.46 per fire, so the held-out gap is small. The limit is the model and inputs, not overfitting.
+
+Not yet used: forest-type maps (only Uljin has the KFS map), a burn-probability footprint threshold, and wind better than one 0.25° ERA5 cell. The Gangneung ERA5 cell lies over the sea.
+
 ## Traceability and reproducibility
 
 The adjacent result JSON files record config, architecture, optimizer, replay settings, seeds, per-episode return/loss, evaluation rows, runtime versions and checkpoint SHA-256. The small `.pt` files contain locally generated state dictionaries, not downloaded untrusted models. The plotting script reads these records directly. Charts do not contain an invented observed IoU.

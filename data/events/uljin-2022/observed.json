@@ -1,0 +1,35 @@
+{
+ "kind": "observational",
+ "event_id": "uljin-2022",
+ "version": "multi-event-v1",
+ "source_url": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a",
+ "mask_method": "pixel dNBR>=0.16 (pre: previous-year clear scene nearest post-365 d); cell burned if >=50% of valid pixels burned; water/cloud excluded via SCL",
+ "time_window": "2021-03-30 (pre) / 2022-04-04 (post)",
+ "pre_aoi_cloud": 0.00015277777777777777,
+ "post_aoi_cloud": 0.0,
+ "pre_items": [
+  "S2A_52SEF_20210330_1_L2A",
+  "S2A_52SEF_20210330_0_L2A",
+  "S2A_52SEG_20210330_1_L2A",
+  "S2A_52SEG_20210330_0_L2A"
+ ],
+ "post_items": [
+  "S2A_52SEF_20220404_0_L2A",
+  "S2A_52SEG_20220404_0_L2A"
+ ],
+ "water_cells": 0,
+ "grid_bounds": [
+  129.25087561777434,
+  37.010461753552825,
+  129.30714047228196,
+  37.055680340200674
+ ],
+ "grid_origin": "lower-left",
+ "shape": [
+  50,
+  50
+ ],
+ "burned_cells": 550,
+ "mask_sha256": "84c901a6fa2c17e6c79f08e30d109e41ac9ebb591c8499a96177a3c6cc568aeb",
+ "built_utc": "2026-10-30T18:12:03.591936+00:00"
+}

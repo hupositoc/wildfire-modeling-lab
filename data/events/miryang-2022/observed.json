@@ -1,0 +1,32 @@
+{
+ "kind": "observational",
+ "event_id": "miryang-2022",
+ "version": "multi-event-v1",
+ "source_url": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a",
+ "mask_method": "pixel dNBR>=0.16 (pre: previous-year clear scene nearest post-365 d); cell burned if >=50% of valid pixels burned; water/cloud excluded via SCL",
+ "time_window": "2021-08-07 (pre) / 2022-08-22 (post)",
+ "pre_aoi_cloud": 0.0402,
+ "post_aoi_cloud": 0.0,
+ "pre_items": [
+  "S2A_52SDE_20210807_1_L2A",
+  "S2A_52SDE_20210807_0_L2A"
+ ],
+ "post_items": [
+  "S2A_52SDE_20220822_0_L2A"
+ ],
+ "water_cells": 9,
+ "grid_bounds": [
+  128.7112091015737,
+  35.492756736944735,
+  128.76639064913812,
+  35.53797532359258
+ ],
+ "grid_origin": "lower-left",
+ "shape": [
+  50,
+  50
+ ],
+ "burned_cells": 272,
+ "mask_sha256": "a354193b34a896cd1fa1715f20c01cf80a5be54bd1e3fcd378bb3c2dfba84c67",
+ "built_utc": "2026-10-30T18:01:31.223608+00:00"
+}

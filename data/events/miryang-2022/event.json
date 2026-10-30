@@ -1,0 +1,28 @@
+{
+ "event": "miryang-2022",
+ "bounds": [
+  128.7112091015737,
+  35.492756736944735,
+  128.76639064913812,
+  35.53797532359258
+ ],
+ "start_utc": "2022-05-31T00:00:00+00:00",
+ "steps": 100,
+ "aoi_wind": {
+  "wind_to_deg_ccw_from_east": -68.6,
+  "mean_speed_ms": 3.1
+ },
+ "reported_cell": [
+  19,
+  38
+ ],
+ "ignition_cell": [
+  19,
+  37
+ ],
+ "ignition_moved_m": 100.0,
+ "burned_cells": 272,
+ "burned_fraction": 0.109,
+ "viirs_cells": 484,
+ "mask_window": "2021-08-07 (pre) / 2022-08-22 (post)"
+}

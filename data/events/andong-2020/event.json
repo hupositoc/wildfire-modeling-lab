@@ -1,0 +1,28 @@
+{
+ "event": "andong-2020",
+ "bounds": [
+  128.54062374315416,
+  36.50827466558886,
+  128.5965211169229,
+  36.553493252236706
+ ],
+ "start_utc": "2020-04-24T06:30:00+00:00",
+ "steps": 82,
+ "aoi_wind": {
+  "wind_to_deg_ccw_from_east": 15.5,
+  "mean_speed_ms": 5.59
+ },
+ "reported_cell": [
+  10,
+  21
+ ],
+ "ignition_cell": [
+  12,
+  23
+ ],
+ "ignition_moved_m": 282.842712474619,
+ "burned_cells": 402,
+ "burned_fraction": 0.161,
+ "viirs_cells": 553,
+ "mask_window": "2019-06-09 (pre) / 2020-06-06 (post)"
+}

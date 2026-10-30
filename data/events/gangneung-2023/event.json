@@ -1,0 +1,28 @@
+{
+ "event": "gangneung-2023",
+ "bounds": [
+  128.86236771862212,
+  37.77440382779562,
+  128.9192094040344,
+  37.819622414443465
+ ],
+ "start_utc": "2023-04-10T23:00:00+00:00",
+ "steps": 18,
+ "aoi_wind": {
+  "wind_to_deg_ccw_from_east": 32.1,
+  "mean_speed_ms": 13.84
+ },
+ "reported_cell": [
+  12,
+  17
+ ],
+ "ignition_cell": [
+  13,
+  19
+ ],
+ "ignition_moved_m": 223.60679774997897,
+ "burned_cells": 240,
+ "burned_fraction": 0.096,
+ "viirs_cells": 0,
+ "mask_window": "2022-05-09 (pre) / 2023-05-09 (post)"
+}

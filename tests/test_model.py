@@ -127,6 +127,14 @@ class ModelTests(unittest.TestCase):
         spot=fast_spread(data,cfg,q,r,(5,15),seed=2,temperature=4.,residence=6,spot=1.,spot_m=800.)
         ys,xs=np.nonzero(spot[-1]&~base[-1]);self.assertTrue(len(xs))
         self.assertGreater(np.max(np.hypot(xs-5,ys-15)),1.5)
+    def test_ca_spreads_downwind_and_skips_nonfuel(self):
+        from wildfire import ca
+        cfg=Config(size=30,horizon=12);data=synthetic(0,cfg);f=data.fields
+        f['wind_to_deg'][:]=0.;f['wind_speed_ms'][:]=8.;f['ndvi'][:]=.6;f['ndvi'][:,:,25:]=-.2
+        ev=ca.arrays('synthetic',data,np.zeros((30,30)),np.zeros((30,30),bool),(10,15))
+        burned=ca.simulate(ev,np.array([.3,0,0,0,.4,0,.2,4.]),runs=4)>0
+        ys,xs=np.nonzero(burned)
+        self.assertGreater(xs.mean(),10.5);self.assertFalse(burned[:,25:].any())
     def test_wind_term_scales_with_speed(self):
         cfg=Config(ndvi_mode='raw');data=synthetic(1,cfg)
         calm=Dataset(dict(data.fields,wind_speed_ms=np.zeros_like(data.fields['wind_speed_ms'])),data.metadata)

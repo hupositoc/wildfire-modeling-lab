@@ -136,7 +136,10 @@ STATE={}
 
 def init_worker(dataset,mask,ndvi_mode,episodes,footprint_mode,ji_reward,spread,barrier,holdout='none',consumed_fuel=False):
     torch.set_num_threads(1)
+    global START
     data=Dataset.load(dataset);target=np.load(str(mask)).astype(bool)
+    # Multi-event datasets carry their own ignition cell; the thesis grid keeps (6,10).
+    START=tuple(data.metadata.get('ignition_cell',START))
     horizon,size,_=data.fields['ndvi'].shape;fit,held=holdout_regions(holdout,size)
     # The JI reward never reaches held-out cells, so their score measures generalisation.
     STATE.update(timing=load_timing(spread['arrival'],target,fit,spread['timing_weight']) if spread.get('arrival') else None)

@@ -1,0 +1,28 @@
+{
+ "event": "hapcheon-2022",
+ "bounds": [
+  128.15573814299628,
+  35.629153629007675,
+  128.21101376098207,
+  35.674372215655524
+ ],
+ "start_utc": "2022-02-28T05:00:00+00:00",
+ "steps": 57,
+ "aoi_wind": {
+  "wind_to_deg_ccw_from_east": 87.5,
+  "mean_speed_ms": 2.1
+ },
+ "reported_cell": [
+  24,
+  10
+ ],
+ "ignition_cell": [
+  23,
+  10
+ ],
+ "ignition_moved_m": 100.0,
+ "burned_cells": 500,
+ "burned_fraction": 0.2,
+ "viirs_cells": 152,
+ "mask_window": "2021-04-02 (pre) / 2022-04-04 (post)"
+}

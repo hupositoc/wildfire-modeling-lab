@@ -23,3 +23,9 @@ Binaries/
 data/*.npz
 data/*.npy
 data/*.csv
+
+# Per-event inputs (data/build_event.py); event.json and observed.json are tracked.
+data/events/**/raw/
+data/events/**/*.npz
+data/events/**/*.npy
+data/events/*.csv

@@ -1,0 +1,31 @@
+{
+ "kind": "observational",
+ "event_id": "gangneung-2023",
+ "version": "multi-event-v1",
+ "source_url": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a",
+ "mask_method": "pixel dNBR>=0.16 (pre: previous-year clear scene nearest post-365 d); cell burned if >=50% of valid pixels burned; water/cloud excluded via SCL",
+ "time_window": "2022-05-09 (pre) / 2023-05-09 (post)",
+ "pre_aoi_cloud": 0.0007111111111111111,
+ "post_aoi_cloud": 0.004738888888888889,
+ "pre_items": [
+  "S2B_52SDG_20220509_0_L2A"
+ ],
+ "post_items": [
+  "S2A_52SDG_20230509_0_L2A"
+ ],
+ "water_cells": 430,
+ "grid_bounds": [
+  128.86236771862212,
+  37.77440382779562,
+  128.9192094040344,
+  37.819622414443465
+ ],
+ "grid_origin": "lower-left",
+ "shape": [
+  50,
+  50
+ ],
+ "burned_cells": 240,
+ "mask_sha256": "fe9a2dc776f1a205b97e3f6e33579b2fbc1fd6b63ed6799f610186fb2e7c1ce0",
+ "built_utc": "2026-10-30T17:57:47.937295+00:00"
+}
