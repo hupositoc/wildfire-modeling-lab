@@ -87,21 +87,39 @@ def reward_stats(rewards,spread):
     fuel=rewards[rewards>-1]
     return {'theta':{h:float(np.quantile(fuel,h)) if h else 0. for h in spread['thetas']},'std':float(fuel.std())}
 
-def run_spread(data,cfg,q,rewards,seed,knob,tree=None,stats=None):
+def run_spread(data,cfg,q,rewards,seed,knob,tree=None,stats=None,full=False):
     """theta_q is a quantile of the fuel-cell reward distribution so it means the same under any weights;
     sharpness is per reward standard deviation."""
     stats=stats or reward_stats(rewards,{'thetas':[knob['theta_q']]})
     theta=stats['theta'][knob['theta_q']];sharpness=None if knob['sharpness'] is None else knob['sharpness']/stats['std']
     barrier=None if knob['tree_min'] is None else tree<knob['tree_min']
-    return fast_spread(data,cfg,q,rewards,START,seed,knob['temperature'],theta=theta,barrier=barrier,sharpness=sharpness,residence=knob.get('residence'),
-                       spot=knob.get('spot'),spot_m=STATE.get('spread',{}).get('spot_m',500.))[-1]
+    frames=fast_spread(data,cfg,q,rewards,START,seed,knob['temperature'],theta=theta,barrier=barrier,sharpness=sharpness,residence=knob.get('residence'),
+                       spot=knob.get('spot'),spot_m=STATE.get('spread',{}).get('spot_m',500.))
+    return frames if full else frames[-1]
+
+def timing_score(burned,timing):
+    """Balanced accuracy of the burned state at the first VIIRS pass: cells seen burning should be
+    reached, cells first seen on later passes should not be."""
+    return .5*(burned[timing['early']].mean()+1-burned[timing['late']].mean())
+
+def load_timing(arrival,target,fit,weight):
+    """VIIRS arrival steps (tools/viirs_arrival.py). Only fit-region cells inside the burn mask are used,
+    so held-out blocks stay unseen."""
+    a=np.load(str(arrival));first=float(np.min(a[np.isfinite(a)]))
+    return {'step':int(first),'weight':weight,'early':target&fit&(np.abs(a-first)<.5),'late':target&fit&np.isfinite(a)&(a>first+.5)}
 
 def policy_scores(data,cfg,network,target,spread,regions,tree=None,rollouts=3):
+    """IoU per region; with --arrival the fit score becomes (1-w)*IoU + w*timing and both parts are kept."""
     q=q_table(data,network);rewards=reward_table(data,cfg);stats=reward_stats(rewards,spread);out=[{} for _ in regions]
+    timing=STATE.get('timing');detail={}
     for k in knobs(spread):
-        maps=[run_spread(data,cfg,q,rewards,s,k,tree,stats) for s in range(rollouts)]
-        for o,region in zip(out,regions):o[json.dumps(k)]=float(np.mean([region_iou(m,target,region) for m in maps]))
-    return out
+        key=json.dumps(k);runs=[run_spread(data,cfg,q,rewards,s,k,tree,stats,full=True) for s in range(rollouts)]
+        for o,region in zip(out,regions):o[key]=float(np.mean([region_iou(r[-1],target,region) for r in runs]))
+        if timing:
+            score=float(np.mean([timing_score(r[timing['step']],timing) for r in runs]))
+            detail[key]={'fit_jaccard':out[0][key],'timing':score}
+            out[0][key]=(1-timing['weight'])*out[0][key]+timing['weight']*score
+    return out,detail
 
 def holdout_regions(kind,n=50,block=10):
     """Fit region (JI training reward and search objective) and held-out region (reported only)."""
@@ -121,6 +139,7 @@ def init_worker(dataset,mask,ndvi_mode,episodes,footprint_mode,ji_reward,spread,
     data=Dataset.load(dataset);target=np.load(str(mask)).astype(bool)
     horizon,size,_=data.fields['ndvi'].shape;fit,held=holdout_regions(holdout,size)
     # The JI reward never reaches held-out cells, so their score measures generalisation.
+    STATE.update(timing=load_timing(spread['arrival'],target,fit,spread['timing_weight']) if spread.get('arrival') else None)
     STATE.update(data=data,target=target,cfg=Config(size=size,horizon=horizon,ndvi_mode=ndvi_mode,consumed_fuel=consumed_fuel,wind_ref_ms=spread.get('wind_ref')),episodes=episodes,
                  footprint=footprint_mode,bonus=ji_reward*(2*target-1.)*fit if ji_reward else None,fit=fit,held=held,
                  spread=spread,tree=load_tree(barrier) if barrier else None)
@@ -130,9 +149,10 @@ def score_point(job):
     cfg=replace(s['cfg'],weights=tuple(float(v) for v in x[:-1]),diffusion_scale=float(x[-1]))
     frequency,reward_sum,network=train_visits(s['data'],cfg,s['episodes'],seed,START,s['bonus'])
     regions=[s['fit']]+([s['held']] if s['held'] is not None else [])
+    detail={}
     if s['footprint']=='visits':scores=[visit_scores(frequency,reward_sum,s['target'],r) for r in regions]
-    else:scores=policy_scores(s['data'],cfg,network,s['target'],s['spread'],regions,s['tree'])
-    return scores+[None]*(2-len(scores))
+    else:scores,detail=policy_scores(s['data'],cfg,network,s['target'],s['spread'],regions,s['tree'])
+    return scores+[None]*(2-len(scores))+[detail]
 
 K=4  # reward weights searched; 5 with --fuel-type
 
@@ -182,6 +202,8 @@ def main():
     parser.add_argument('--spots',type=float,nargs='+',default=[],help='(G) spotting chance per burning cell per step; omitted disables spotting')
     parser.add_argument('--spot-m',type=float,default=500.,help='(G) mean spotting distance in metres at 5 m/s wind')
     parser.add_argument('--wind-ref',type=float,help='(H) scale the wind reward term by wind speed / this value (m/s)')
+    parser.add_argument('--arrival',type=Path,help='(I) VIIRS arrival steps (tools/viirs_arrival.py); adds first-pass timing to the search objective')
+    parser.add_argument('--timing-weight',type=float,default=.5,help='(I) objective = (1-w)*fit IoU + w*timing balanced accuracy')
     parser.add_argument('--sharpness',type=float,nargs='+',default=[],help='(E) P(ignite)=sigmoid(k*(r-theta)/std(r)); omitted means hard threshold')
     parser.add_argument('--holdout',choices=['none','checker'],default='none',help='checker: JI reward and search objective use alternate 10x10 blocks; the rest is reported as held-out')
     parser.add_argument('--consumed-fuel',action='store_true',help='re-entering a cell burned earlier in the episode earns nothing (beyond the thesis)')
@@ -191,7 +213,8 @@ def main():
     CF_RANGE=tuple(args.cf_range);K=5 if args.fuel_type else 4
     if args.tree_mins and not args.barrier:parser.error('--tree-mins needs --barrier')
     spread={'temperatures':args.temperatures,'thetas':args.thetas,'tree_mins':[None]+args.tree_mins,'sharpness':[None]+args.sharpness,'residences':args.residences or [None],
-            'spots':args.spots or [None],'spot_m':args.spot_m,'wind_ref':args.wind_ref}
+            'spots':args.spots or [None],'spot_m':args.spot_m,'wind_ref':args.wind_ref,
+            'arrival':str(args.arrival) if args.arrival else None,'timing_weight':args.timing_weight}
     setup=(args.dataset,args.mask,args.ndvi_mode,args.episodes,args.footprint,args.ji_reward,spread,args.barrier,args.holdout,args.consumed_fuel)
     init_worker(*setup)
     pool=ProcessPoolExecutor(args.workers,initializer=init_worker,initargs=setup)
@@ -206,6 +229,8 @@ def main():
                  'jaccard':mean[knob],'per_seed':[p[0][knob] for p in per]}
             # Reported only; never used to pick the knob or the next search point.
             if per[0][1] is not None:row['heldout_jaccard']=float(np.mean([p[1][knob] for p in per]))
+            # With --arrival, 'jaccard' is the search objective; its IoU and timing parts are kept here.
+            if per[0][2]:row.update({k:float(np.mean([p[2][knob][k] for p in per])) for k in ('fit_jaccard','timing')})
             rows.append(row);print(json.dumps({k:(round(v,4) if isinstance(v,float) else v) for k,v in row.items()}),flush=True)
         return rows
     history+=evaluate(list(simplex_lhs(args.lhs,rng)),'simplex-lhs',args.seeds)
@@ -237,11 +262,12 @@ def main():
     result={'kind':'in_sample_calibration','event_id':s['data'].metadata.get('event_id'),'thesis_reported_jaccard':.726,
             'best':best,'best_jaccard_recomputed':region_iou(predicted,s['target'],s['fit']),'holdout':args.holdout,**held,
             'random_policy_jaccard_same_config':baseline,
-            'dqn_gain_over_random':best['jaccard']-baseline,
+            'dqn_gain_over_random':best.get('fit_jaccard',best['jaccard'])-baseline,
             'confirm_unseen_seeds':confirm,'observed_cells':int(s['target'].sum()),'predicted_cells':int(predicted.sum()),
             'footprint':args.footprint,'knob':'tau (visit fraction)' if args.footprint=='visits' else 'temperature, theta_q, tree_min, sharpness',
             'beyond_thesis':{'thetas':args.thetas,'barrier':str(args.barrier) if args.barrier else None,'tree_mins':args.tree_mins,'sharpness':args.sharpness,
-                           'residences':args.residences,'spots':args.spots,'spot_m':args.spot_m,'wind_ref':args.wind_ref},
+                           'residences':args.residences,'spots':args.spots,'spot_m':args.spot_m,'wind_ref':args.wind_ref,
+                           'arrival':str(args.arrival) if args.arrival else None,'timing_weight':args.timing_weight if args.arrival else None},
             'ji_reward_lambda':args.ji_reward,'mask':str(args.mask),
             'search':{'simplex_lhs':args.lhs,'bayesian_rounds':args.rounds,'batch':args.batch,'episodes':args.episodes,'search_seeds':args.seeds,
                       'cf_range_log':CF_RANGE,'tau_grid':[float(TAUS[0]),float(TAUS[-1])],'temperatures':args.temperatures},

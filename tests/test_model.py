@@ -133,6 +133,15 @@ class ModelTests(unittest.TestCase):
         scaled=Config(ndvi_mode='raw',wind_ref_ms=5.);still=Config(ndvi_mode='raw',weights=cfg.weights[:3]+(0,))
         self.assertAlmostEqual(calm.reward((7,10),2,0,scaled),calm.reward((7,10),2,0,still))
         np.testing.assert_allclose(reward_table(data,scaled)[0,10,7],[data.reward((7,10),a,0,scaled) for a in range(9)],atol=1e-5)
+    def test_timing_score_uses_fit_cells_only(self):
+        from wildfire.calibrate import load_timing,timing_score
+        import tempfile,os
+        a=np.full((4,4),np.inf);a[0,:2]=4.3;a[3,:2]=29.;target=np.ones((4,4),bool);fit=np.zeros((4,4),bool);fit[:,:1]=True
+        with tempfile.TemporaryDirectory() as d:
+            np.save(os.path.join(d,'a.npy'),a);timing=load_timing(os.path.join(d,'a.npy'),target,fit,.5)
+        self.assertEqual(timing['step'],4);self.assertEqual(timing['early'].sum(),1);self.assertEqual(timing['late'].sum(),1)
+        burned=np.zeros((4,4),bool);burned[0,0]=True;self.assertEqual(timing_score(burned,timing),1.)
+        burned[3,0]=True;self.assertEqual(timing_score(burned,timing),.5)
     def test_micromet_downscaling(self):
         from data.synth_weather import downscale
         z=np.add.outer(np.zeros(50),np.linspace(0,500,50))

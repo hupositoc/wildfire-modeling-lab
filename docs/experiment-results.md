@@ -74,6 +74,7 @@ The random policy now keeps the selected ignition threshold θ and burnout time,
 | run23 | run21, C_f in [0.067, 2] | **0.507** | 0.457 | 1,140 |
 | run24 | run23 + spotting | 0.478 | 0.461 | 1,353 |
 | run25 | run24 + wind term scaled by wind speed | 0.475 | 0.488 | 1,013 |
+| run26 | run24, search objective includes VIIRS timing | 0.492 | 0.475 | 1,395 |
 
 In run21, C_f, temperature and θ all sat at the top of their ranges. Widening only C_f, the one parameter with an independent physical reading (VIIRS timing, below), gave run23. There C_f settled inside the range at 0.79, with burnout time 8 steps (4 h), temperature 8 and θ 0.6. Temperature and θ are still at their upper bounds. They were not widened, because a higher temperature only moves the policy towards random. The unseen seeds score 0.54–0.57 on the fit blocks (mean 0.552, random 0.506).
 
@@ -95,6 +96,12 @@ The learned policy keeps the order of burning better than the random policy, but
 - **Wind speed in the reward (`--wind-ref 5`).** The wind-alignment term is multiplied by wind speed / 5 m/s, so direction matters little in calm air.
 
 run24 selected a spotting chance of 0.02. Spotting fixed the timing problem: with run24's policy, 83% of the first-pass cells are reached by step 4, against 35% for run23. 36% of the late cells are also reached too early, against 61% for the random policy. The fit blocks rose to 0.565, but held-out IoU fell to 0.478, only +0.017 over random. Scaling the wind term (run25) put held-out IoU below the random policy (0.475 vs 0.488). Neither addition improves the extent score on unseen blocks, so run23 remains the reported extent result. Spotting is kept as an option because it brings the timing closer to VIIRS.
+
+**Timing in the search objective (run26).** `--arrival tmp_provisional/viirs_arrival.npy` changes the search objective to 0.5 × fit-block IoU + 0.5 × timing score. The weight 0.5 was set before the run and not tuned. The timing score is the balanced accuracy at the first VIIRS pass: the share of cells seen burning that the model has reached, and the share of later-seen cells that it has not reached yet. Only cells in the fit blocks enter the score, so the held-out blocks stay unseen. VIIRS timing is then no longer an independent check.
+
+run26 selected C_f 1.18, spotting 0.1, burnout time 8 steps, temperature 8 and θ 0.6. On the five unseen seeds, held-out IoU is 0.492 against 0.475 for the random policy. The ensemble at the fixed 0.5 cut gives 0.490 (1,363 cells). Over the whole mask, the policy reaches 88% of the first-pass cells and 30% of the later cells too early, a timing score of 0.79. The random policy scores 0.68 (99% and 63%), and run23 scores 0.63 (35% and 9%).
+
+Compared with run23, run26 gives up about 0.02 of held-out IoU for spread timing close to the satellite record. run23 remains the best extent score. run26 is the most physically consistent model.
 
 The forest-type term did not improve the policy, although the map is informative: in the supervised reference below it raises AUC from 0.74 to 0.77.
 
