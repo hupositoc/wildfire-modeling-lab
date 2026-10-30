@@ -46,7 +46,9 @@ The state also omits explicit time while the environment may be time-varying, as
 
 The target is `data/uljin_observed.npy`: a Sentinel-2 dNBR burn mask built independently by `data/build_burn_mask.py`. The map digitized from thesis Fig. 4.5(a) is not used as the evaluation target. The ignition cell (6,10) sits about 2 km from the reported ignition village (Ducheon-ri) and where the fire entered the AOI.
 
-**Mask v2 (current, 1,034 of 2,500 cells).** The first mask (v1, 651 cells) used the 2022-03-15 image, ten days after ignition. Scorched pine had not yet browned, so crown-scorched stands kept a near-normal NBR and were missed. The same rule (pre-fire 2022-02-18, ISODATA threshold, dNBR ≥ 0.1 floor after Key & Benson 2006) on the 2022-04-04 image gives 1,034 cells and contains 647 of the 651 v1 cells. Every cloud-free scene from 2022-04-09 to 2022-05-04 gives 820–1,105 cells, so the April extent is stable while March is the outlier. Assessing after browning follows MTBS extended-assessment practice. The v1 mask is kept as `data/uljin_observed_20220315.npy`.
+**Mask v3 (current, 1,456 of 2,500 cells).** v2 compared a February pre-fire image with April. Sun angle and spring phenology then raise dNBR to 0.1–0.2 over unburned forest far from the fire, and the low-severity surface burn under living crowns is lost in that noise. v3 pairs the 2021-03-25 image (same season, previous year) with 2022-04-04. Outside the burn the median dNBR is −0.01 (SD 0.03). A pixel is burned at dNBR ≥ 0.16, the threshold that scored best for this fire in Park et al. (2022, *Korean J. Remote Sens.* 38(5-2), doi:10.7780/kjrs.2022.38.5.2.9). A cell is burned when at least half of its pixels are. v3 contains 986 of the 1,034 v2 cells. Applied to the whole Uljin–Samcheok fire, the same pair gives 8,700 ha at 0.16 and 13,600 ha at 0.1, against the official 16,302 ha, which counts the whole perimeter. The February pair gave about 6,000–8,000 ha. The v2 mask is kept as `data/uljin_observed_v2_20220404.npy`; `--rule isodata` rebuilds it.
+
+**Mask v2 (1,034 cells, superseded).** The first mask (v1, 651 cells) used the 2022-03-15 image, ten days after ignition. Scorched pine had not yet browned, so crown-scorched stands kept a near-normal NBR and were missed. The same rule (pre-fire 2022-02-18, ISODATA threshold, dNBR ≥ 0.1 floor after Key & Benson 2006) on the 2022-04-04 image gives 1,034 cells and contains 647 of the 651 v1 cells. Every cloud-free scene from 2022-04-09 to 2022-05-04 gives 820–1,105 cells, so the April extent is stable while March is the outlier. Assessing after browning follows MTBS extended-assessment practice. The v1 mask is kept as `data/uljin_observed_20220315.npy`.
 
 `wildfire/calibrate.py` runs the thesis search (simplex LHS, then Bayesian optimisation of the four reward weights and C_f) with these safeguards:
 
@@ -60,7 +62,20 @@ Two optional additions go beyond the thesis:
 - **Burnout time (`--residences`).** A cell stops spreading fire a fixed number of 30-minute steps after it ignites. Without it, every burned cell stays active until the end of the episode.
 - **Forest type (`--fuel-type`).** `data/add_forest_type.py` takes the conifer share per cell from the KFS 1:5,000 forest type map (2019 edition, before the fire). A fifth reward weight scores it. In the AOI the conifer share is 0.64, nearly all *Pinus densiflora*.
 
-### Results on mask v2
+### Results on mask v3
+
+Because 58% of the AOI burned, predicting every cell as burned already gives IoU 0.55 on the held-out blocks (0.61 on the fit blocks). Both this and the random policy are reported.
+
+| Run | Setting | Held-out IoU (5 unseen seeds) | Random policy, held-out | All cells burned, held-out | Predicted cells |
+|---|---|---:|---:|---:|---:|
+| run27 | run23 setting (burnout time, C_f in [0.067, 2]) | **0.651** | 0.642 | 0.550 | 1,991 |
+| run28 | run26 setting (spotting, VIIRS timing in the objective) | 0.642 | 0.636 | 0.550 | 1,945 |
+
+On the fit blocks the unseen seeds score 0.719 (run27) and 0.717 (run28). Held-out IoU rose from about 0.5 to 0.65. This rise comes from the corrected target and from the spread rules: θ, burnout time and fast C_f make the footprint the right size and shape. The learned policy itself adds little. In run27 the random policy with the same knobs scores the same on the fit blocks (0.720), and +0.009 lower on the held-out blocks. run27 put almost all reward weight on NDVI (0.95). run28 keeps a timing score of 0.89 at the first VIIRS pass.
+
+**Supervised reference on v3.** Gradient boosting on the static inputs with the same checkerboard split reaches a best-threshold held-out IoU of 0.70, or 0.71 with forest type (AUC 0.80 and 0.84).
+
+### Results on mask v2 (superseded)
 
 Scores are IoU against mask v2. "Held-out" means the held-out blocks scored by the five unseen seeds. Because the burned area is larger, the random baseline rises to 0.41–0.46; the DQN gain over it is the number that matters.
 

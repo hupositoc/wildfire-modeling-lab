@@ -1,8 +1,11 @@
-"""Observed Uljin 2022 burned-area mask from Sentinel-2 with ISODATA, following thesis section 4.
+"""Observed Uljin 2022 burned-area mask from Sentinel-2 dNBR.
 
-The burned-class rule is fixed before any model comparison: ISODATA clusters whose mean dNBR
-is at least 0.1 (USGS lower bound of low severity) are burned; a grid cell is burned when at
-least half of its valid pixels are burned. Nothing here reads model output or a target score.
+Default (v3): a same-season pre-fire image from the previous year (2021-03-25) against the first
+clear April 2022 image, so spring phenology cancels out. A pixel is burned at dNBR >= 0.16, the
+threshold that scored best for this fire in Park et al. (2022, Korean J. Remote Sens. 38(5-2),
+doi:10.7780/kjrs.2022.38.5.2.9). A grid cell is burned when at least half of its valid pixels are
+burned. --rule isodata reproduces v1/v2 (thesis section 4: ISODATA clusters with mean dNBR >= 0.1).
+Nothing here reads model output or a target score.
 """
 import argparse
 from datetime import datetime, timezone
@@ -51,7 +54,13 @@ def indices(items):
 
 def main():
     parser=argparse.ArgumentParser()
-    parser.add_argument('--pre',default='2022-01-15/2022-03-03');# Post window starts in April: on 2022-03-15 scorched pine crowns had not yet browned, so dNBR missed
+    # A February pre-image differs from April in sun angle and phenology: unburned forest far from the
+    # fire then shows dNBR 0.1-0.2 and the low-severity surface burn is lost in that noise. Over the whole
+    # fire, the 2021-03-25 pair gives a median dNBR of -0.01 (SD 0.03) outside the burn.
+    parser.add_argument('--pre',default='2021-03-25/2021-03-25')
+    parser.add_argument('--rule',choices=['threshold','isodata'],default='threshold')
+    parser.add_argument('--threshold',type=float,default=.16)
+# Post window starts in April: on 2022-03-15 scorched pine crowns had not yet browned, so dNBR missed
     # much of the burn (651 vs 1,034 cells). The first clear April scene precedes broadleaf leaf-out.
     parser.add_argument('--post',default='2022-04-01/2022-04-30')
     parser.add_argument('--out',type=Path,default=Path('data/uljin_observed.npy'))
@@ -64,16 +73,21 @@ def main():
     valid=np.isfinite(dnbr)&np.isfinite(ndvi_post)&~np.isin(post_scl,CLOUD_CLASSES+(6,))&~np.isin(pre_scl,CLOUD_CLASSES+(6,))
     feats=np.stack([nbr_post[valid],ndvi_post[valid],dnbr[valid]],1)
     z=(feats-feats.mean(0))/feats.std(0)
-    labels,_=isodata(z)
-    burned_class=[c for c in np.unique(labels) if feats[labels==c,2].mean()>=.1]
-    burned=np.full(dnbr.shape,np.nan);burned[valid]=np.isin(labels,burned_class)
+    burned=np.full(dnbr.shape,np.nan)
+    if args.rule=='isodata':
+        labels,_=isodata(z)
+        burned_class=[c for c in np.unique(labels) if feats[labels==c,2].mean()>=.1]
+        burned[valid]=np.isin(labels,burned_class)
+    else:labels=np.zeros(1);burned_class=[];burned[valid]=dnbr[valid]>=args.threshold
     fraction=cells(burned)
     mask=np.nan_to_num(fraction)>=.5
     args.out.parent.mkdir(parents=True,exist_ok=True)
     np.save(str(args.out),mask)
-    meta={'kind':'observational','event_id':'uljin-2022','version':'reconstruction-v2',
+    meta={'kind':'observational','event_id':'uljin-2022','version':'reconstruction-v3' if args.rule=='threshold' else 'reconstruction-isodata',
           'source_url':'https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a',
-          'mask_method':'ISODATA on standardized [post NBR, post NDVI, dNBR] at ~10 m; clusters with mean dNBR>=0.1 are burned; cell burned if >=50% of valid pixels burned; water/cloud excluded via SCL',
+          'mask_method':('pixel dNBR>=%g (same-season pre-fire image of the previous year)'%args.threshold if args.rule=='threshold' else
+                         'ISODATA on standardized [post NBR, post NDVI, dNBR] at ~10 m; clusters with mean dNBR>=0.1 are burned')
+                        +'; cell burned if >=50% of valid pixels burned; water/cloud excluded via SCL',
           'time_window':pre_day+' (pre) / '+post_day+' (post)','pre_aoi_cloud':pre_cloud,'post_aoi_cloud':post_cloud,
           'pre_items':[i['id'] for i in pre_days[pre_day]],'post_items':[i['id'] for i in post_days[post_day]],
           'grid_bounds':list(BOUNDS),'grid_origin':'lower-left','shape':[N,N],

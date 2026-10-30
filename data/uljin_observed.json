@@ -1,15 +1,17 @@
 {
   "kind": "observational",
   "event_id": "uljin-2022",
-  "version": "reconstruction-v2",
+  "version": "reconstruction-v3",
   "source_url": "https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a",
-  "mask_method": "ISODATA on standardized [post NBR, post NDVI, dNBR] at ~10 m; clusters with mean dNBR>=0.1 are burned; cell burned if >=50% of valid pixels burned; water/cloud excluded via SCL",
-  "time_window": "2022-02-18 (pre) / 2022-04-04 (post)",
+  "mask_method": "pixel dNBR>=0.16 (same-season pre-fire image of the previous year); cell burned if >=50% of valid pixels burned; water/cloud excluded via SCL",
+  "time_window": "2021-03-25 (pre) / 2022-04-04 (post)",
   "pre_aoi_cloud": 0.0,
   "post_aoi_cloud": 0.0,
   "pre_items": [
-    "S2B_52SEF_20220218_0_L2A",
-    "S2B_52SEG_20220218_0_L2A"
+    "S2B_52SEF_20210325_1_L2A",
+    "S2B_52SEF_20210325_0_L2A",
+    "S2B_52SEG_20210325_1_L2A",
+    "S2B_52SEG_20210325_0_L2A"
   ],
   "post_items": [
     "S2A_52SEF_20220404_0_L2A",
@@ -26,10 +28,10 @@
     50,
     50
   ],
-  "burned_cells": 1034,
-  "clusters": 7,
-  "burned_clusters": 3,
+  "burned_cells": 1456,
+  "clusters": 1,
+  "burned_clusters": 0,
   "thesis_difference": "thesis used VIIRS reference [25] and GEE ISODATA with unreported settings; this is an independent reconstruction",
-  "mask_sha256": "2840b7e4fe039f1e7e12ae585b431162c9cd5ffed8ac78bfc37b330baa35d441",
-  "built_utc": "2026-10-27T03:00:19.388438+00:00"
+  "mask_sha256": "a0bf1e8f111116ea6caf6029725d65abf68c50f74929406eba6270d4aa1840d3",
+  "built_utc": "2026-10-30T09:01:04.909962+00:00"
 }
